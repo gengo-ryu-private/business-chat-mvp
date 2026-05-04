@@ -10,10 +10,10 @@
 
 このMVPでは、以下の役割分担とする。
 
-| サービス | 役割 |
-|---|---|
-| Firebase Authentication | ユーザー認証を管理する |
-| Firestore | アプリ内データを管理する |
+| サービス                | 役割                     |
+| ----------------------- | ------------------------ |
+| Firebase Authentication | ユーザー認証を管理する   |
+| Firestore               | アプリ内データを管理する |
 
 ## データ設計の前提
 
@@ -55,34 +55,34 @@ users/{userId}
 
 ### フィールド
 
-| フィールド名 | 型 | 必須 | 説明 |
-|---|---|---|---|
-| id | string | 必須 | Firebase Authentication の UID |
-| displayName | string | 必須 | アプリ上で表示するユーザー名 |
-| email | string | 必須 | メールアドレス |
-| tenantId | string | 必須 | 所属テナントID |
-| role | string | 必須 | ユーザー種別 |
-| createdAt | timestamp | 必須 | 作成日時 |
-| updatedAt | timestamp | 必須 | 更新日時 |
+| フィールド名 | 型        | 必須 | 説明                           |
+| ------------ | --------- | ---- | ------------------------------ |
+| id           | string    | 必須 | Firebase Authentication の UID |
+| displayName  | string    | 必須 | アプリ上で表示するユーザー名   |
+| email        | string    | 必須 | メールアドレス                 |
+| tenantId     | string    | 必須 | 所属テナントID                 |
+| role         | string    | 必須 | ユーザー種別                   |
+| createdAt    | timestamp | 必須 | 作成日時                       |
+| updatedAt    | timestamp | 必須 | 更新日時                       |
 
 ### role の値
 
-| 値 | 意味 |
-|---|---|
-| admin | 管理者ユーザー |
-| member | 一般ユーザー |
+| 値     | 意味           |
+| ------ | -------------- |
+| admin  | 管理者ユーザー |
+| member | 一般ユーザー   |
 
 ### データ例
 
 ```json
 {
-  "id": "firebase-auth-uid-001",
-  "displayName": "山田太郎",
-  "email": "yamada@example.com",
-  "tenantId": "tenant-001",
-  "role": "admin",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "firebase-auth-uid-001",
+    "displayName": "山田太郎",
+    "email": "yamada@example.com",
+    "tenantId": "tenant-001",
+    "role": "admin",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 
@@ -100,25 +100,25 @@ tenants/{tenantId}
 
 ### フィールド
 
-| フィールド名 | 型 | 必須 | 説明 |
-|---|---|---|---|
-| id | string | 必須 | テナントID |
-| name | string | 必須 | テナント名 |
-| joinCode | string | 必須 | 既存テナント参加用コード |
-| createdBy | string | 必須 | 作成者ユーザーID |
-| createdAt | timestamp | 必須 | 作成日時 |
-| updatedAt | timestamp | 必須 | 更新日時 |
+| フィールド名 | 型        | 必須 | 説明                     |
+| ------------ | --------- | ---- | ------------------------ |
+| id           | string    | 必須 | テナントID               |
+| name         | string    | 必須 | テナント名               |
+| joinCode     | string    | 必須 | 既存テナント参加用コード |
+| createdBy    | string    | 必須 | 作成者ユーザーID         |
+| createdAt    | timestamp | 必須 | 作成日時                 |
+| updatedAt    | timestamp | 必須 | 更新日時                 |
 
 ### データ例
 
 ```json
 {
-  "id": "tenant-001",
-  "name": "サンプル開発チーム",
-  "joinCode": "ABC123",
-  "createdBy": "firebase-auth-uid-001",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "tenant-001",
+    "name": "サンプル開発チーム",
+    "joinCode": "ABC123",
+    "createdBy": "firebase-auth-uid-001",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 
@@ -136,27 +136,27 @@ tenants/{tenantId}/channels/{channelId}
 
 ### フィールド
 
-| フィールド名 | 型 | 必須 | 説明 |
-|---|---|---|---|
-| id | string | 必須 | チャンネルID |
-| tenantId | string | 必須 | 所属テナントID |
-| name | string | 必須 | チャンネル名 |
-| description | string | 任意 | チャンネル説明 |
-| createdBy | string | 必須 | 作成者ユーザーID |
-| createdAt | timestamp | 必須 | 作成日時 |
-| updatedAt | timestamp | 必須 | 更新日時 |
+| フィールド名 | 型        | 必須 | 説明             |
+| ------------ | --------- | ---- | ---------------- |
+| id           | string    | 必須 | チャンネルID     |
+| tenantId     | string    | 必須 | 所属テナントID   |
+| name         | string    | 必須 | チャンネル名     |
+| description  | string    | 任意 | チャンネル説明   |
+| createdBy    | string    | 必須 | 作成者ユーザーID |
+| createdAt    | timestamp | 必須 | 作成日時         |
+| updatedAt    | timestamp | 必須 | 更新日時         |
 
 ### データ例
 
 ```json
 {
-  "id": "channel-001",
-  "tenantId": "tenant-001",
-  "name": "general",
-  "description": "全体連絡用チャンネル",
-  "createdBy": "firebase-auth-uid-001",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "channel-001",
+    "tenantId": "tenant-001",
+    "name": "general",
+    "description": "全体連絡用チャンネル",
+    "createdBy": "firebase-auth-uid-001",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 
@@ -174,27 +174,27 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 
 ### フィールド
 
-| フィールド名 | 型 | 必須 | 説明 |
-|---|---|---|---|
-| id | string | 必須 | メッセージID |
-| tenantId | string | 必須 | 所属テナントID |
-| channelId | string | 必須 | 所属チャンネルID |
-| body | string | 必須 | メッセージ本文 |
-| senderId | string | 必須 | 投稿者ユーザーID |
-| senderName | string | 必須 | 投稿者名 |
-| createdAt | timestamp | 必須 | 投稿日時 |
+| フィールド名 | 型        | 必須 | 説明             |
+| ------------ | --------- | ---- | ---------------- |
+| id           | string    | 必須 | メッセージID     |
+| tenantId     | string    | 必須 | 所属テナントID   |
+| channelId    | string    | 必須 | 所属チャンネルID |
+| body         | string    | 必須 | メッセージ本文   |
+| senderId     | string    | 必須 | 投稿者ユーザーID |
+| senderName   | string    | 必須 | 投稿者名         |
+| createdAt    | timestamp | 必須 | 投稿日時         |
 
 ### データ例
 
 ```json
 {
-  "id": "message-001",
-  "tenantId": "tenant-001",
-  "channelId": "channel-001",
-  "body": "本日の進捗を共有します。",
-  "senderId": "firebase-auth-uid-002",
-  "senderName": "佐藤花子",
-  "createdAt": "serverTimestamp"
+    "id": "message-001",
+    "tenantId": "tenant-001",
+    "channelId": "channel-001",
+    "body": "本日の進捗を共有します。",
+    "senderId": "firebase-auth-uid-002",
+    "senderName": "佐藤花子",
+    "createdAt": "serverTimestamp"
 }
 ```
 
@@ -216,13 +216,13 @@ Message
   └─ belongs to User
 ```
 
-| データ | 関係 | 説明 |
-|---|---|---|
-| users.tenantId | tenants.id | ユーザーが所属するテナント |
-| channels.tenantId | tenants.id | チャンネルが所属するテナント |
-| messages.tenantId | tenants.id | メッセージが所属するテナント |
+| データ             | 関係        | 説明                             |
+| ------------------ | ----------- | -------------------------------- |
+| users.tenantId     | tenants.id  | ユーザーが所属するテナント       |
+| channels.tenantId  | tenants.id  | チャンネルが所属するテナント     |
+| messages.tenantId  | tenants.id  | メッセージが所属するテナント     |
 | messages.channelId | channels.id | メッセージが投稿されたチャンネル |
-| messages.senderId | users.id | メッセージ投稿者 |
+| messages.senderId  | users.id    | メッセージ投稿者                 |
 
 ## ユーザー登録時のデータ作成
 
@@ -240,13 +240,13 @@ Message
 
 ```json
 {
-  "id": "firebase-auth-uid-001",
-  "displayName": "山田太郎",
-  "email": "yamada@example.com",
-  "tenantId": "tenant-001",
-  "role": "admin",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "firebase-auth-uid-001",
+    "displayName": "山田太郎",
+    "email": "yamada@example.com",
+    "tenantId": "tenant-001",
+    "role": "admin",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 
@@ -254,12 +254,12 @@ Message
 
 ```json
 {
-  "id": "tenant-001",
-  "name": "サンプル開発チーム",
-  "joinCode": "ABC123",
-  "createdBy": "firebase-auth-uid-001",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "tenant-001",
+    "name": "サンプル開発チーム",
+    "joinCode": "ABC123",
+    "createdBy": "firebase-auth-uid-001",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 
@@ -277,13 +277,13 @@ Message
 
 ```json
 {
-  "id": "firebase-auth-uid-002",
-  "displayName": "佐藤花子",
-  "email": "sato@example.com",
-  "tenantId": "tenant-001",
-  "role": "member",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
+    "id": "firebase-auth-uid-002",
+    "displayName": "佐藤花子",
+    "email": "sato@example.com",
+    "tenantId": "tenant-001",
+    "role": "member",
+    "createdAt": "serverTimestamp",
+    "updatedAt": "serverTimestamp"
 }
 ```
 

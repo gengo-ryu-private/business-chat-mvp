@@ -27,17 +27,17 @@
 
 ## 採用技術一覧
 
-| 分類 | 使用技術 | 主な役割 |
-|---|---|---|
-| フレームワーク | Next.js | 画面実装、ルーティング、アプリ全体の構成 |
-| UI | React | コンポーネントベースの画面構築 |
-| 言語 | TypeScript | 型安全な実装 |
-| 認証 | Firebase Authentication | ユーザー登録、ログイン、ログアウト |
-| データベース | Firestore | ユーザー、テナント、チャンネル、メッセージの管理 |
-| 単体テスト | Vitest | バリデーション、権限判定、データ整形処理のテスト |
-| コンポーネントテスト | React Testing Library | フォーム、一覧、表示制御のテスト |
-| E2Eテスト | Playwright | 主要なユーザー操作のテスト |
-| バージョン管理 | Git / GitHub | ソースコードと設計ドキュメントの管理 |
+| 分類                 | 使用技術                | 主な役割                                         |
+| -------------------- | ----------------------- | ------------------------------------------------ |
+| フレームワーク       | Next.js                 | 画面実装、ルーティング、アプリ全体の構成         |
+| UI                   | React                   | コンポーネントベースの画面構築                   |
+| 言語                 | TypeScript              | 型安全な実装                                     |
+| 認証                 | Firebase Authentication | ユーザー登録、ログイン、ログアウト               |
+| データベース         | Firestore               | ユーザー、テナント、チャンネル、メッセージの管理 |
+| 単体テスト           | Vitest                  | バリデーション、権限判定、データ整形処理のテスト |
+| コンポーネントテスト | React Testing Library   | フォーム、一覧、表示制御のテスト                 |
+| E2Eテスト            | Playwright              | 主要なユーザー操作のテスト                       |
+| バージョン管理       | Git / GitHub            | ソースコードと設計ドキュメントの管理             |
 
 ## Next.js
 
@@ -88,35 +88,35 @@ MVPでは、以下の目的で使用する。
 type UserRole = 'admin' | 'member';
 
 type AppUser = {
-  id: string;
-  displayName: string;
-  email: string;
-  tenantId: string;
-  role: UserRole;
+    id: string;
+    displayName: string;
+    email: string;
+    tenantId: string;
+    role: UserRole;
 };
 
 type Tenant = {
-  id: string;
-  name: string;
-  joinCode: string;
-  createdBy: string;
+    id: string;
+    name: string;
+    joinCode: string;
+    createdBy: string;
 };
 
 type Channel = {
-  id: string;
-  tenantId: string;
-  name: string;
-  description?: string;
-  createdBy: string;
+    id: string;
+    tenantId: string;
+    name: string;
+    description?: string;
+    createdBy: string;
 };
 
 type Message = {
-  id: string;
-  tenantId: string;
-  channelId: string;
-  body: string;
-  senderId: string;
-  senderName: string;
+    id: string;
+    tenantId: string;
+    channelId: string;
+    body: string;
+    senderId: string;
+    senderName: string;
 };
 ```
 
@@ -178,11 +178,11 @@ MVPでは、以下を制御する。
 
 MVPでは、以下の3種類のテストツールを使用する。
 
-| テスト種別 | 使用ツール | 主な対象 |
-|---|---|---|
-| 単体テスト | Vitest | バリデーション、権限判定、データ整形処理 |
-| コンポーネントテスト | React Testing Library | フォーム、一覧、表示制御 |
-| E2Eテスト | Playwright | ユーザー登録、ログイン、チャンネル作成、メッセージ投稿 |
+| テスト種別           | 使用ツール            | 主な対象                                               |
+| -------------------- | --------------------- | ------------------------------------------------------ |
+| 単体テスト           | Vitest                | バリデーション、権限判定、データ整形処理               |
+| コンポーネントテスト | React Testing Library | フォーム、一覧、表示制御                               |
+| E2Eテスト            | Playwright            | ユーザー登録、ログイン、チャンネル作成、メッセージ投稿 |
 
 ## Vitest
 
@@ -242,38 +242,38 @@ MVPでは、以下を管理対象とする。
 
 ## 機能と使用技術の対応
 
-| 機能 | 使用技術 |
-|---|---|
-| ユーザー登録 | Next.js / React / Firebase Authentication / Firestore |
-| ログイン | Next.js / React / Firebase Authentication |
-| ログアウト | Firebase Authentication |
-| 新規テナント作成 | Firestore |
-| 既存テナント参加 | Firestore |
-| 所属テナント情報表示 | Firestore |
-| チャンネル作成 | Firestore / Firestore Security Rules |
-| チャンネル一覧表示 | Firestore |
-| チャンネル詳細表示 | Next.js / Firestore |
-| メッセージ投稿 | Firestore / Firestore Security Rules |
-| メッセージ一覧表示 | Firestore |
-| 認証制御 | Firebase Authentication / Next.js |
-| 権限制御 | Firestore / Firestore Security Rules / TypeScript |
-| 単体テスト | Vitest |
-| コンポーネントテスト | React Testing Library |
-| E2Eテスト | Playwright |
+| 機能                 | 使用技術                                              |
+| -------------------- | ----------------------------------------------------- |
+| ユーザー登録         | Next.js / React / Firebase Authentication / Firestore |
+| ログイン             | Next.js / React / Firebase Authentication             |
+| ログアウト           | Firebase Authentication                               |
+| 新規テナント作成     | Firestore                                             |
+| 既存テナント参加     | Firestore                                             |
+| 所属テナント情報表示 | Firestore                                             |
+| チャンネル作成       | Firestore / Firestore Security Rules                  |
+| チャンネル一覧表示   | Firestore                                             |
+| チャンネル詳細表示   | Next.js / Firestore                                   |
+| メッセージ投稿       | Firestore / Firestore Security Rules                  |
+| メッセージ一覧表示   | Firestore                                             |
+| 認証制御             | Firebase Authentication / Next.js                     |
+| 権限制御             | Firestore / Firestore Security Rules / TypeScript     |
+| 単体テスト           | Vitest                                                |
+| コンポーネントテスト | React Testing Library                                 |
+| E2Eテスト            | Playwright                                            |
 
 ## 採用しない技術・構成
 
 MVPでは、以下の技術や構成は採用しない。
 
-| 技術・構成 | 採用しない理由 |
-|---|---|
-| 独自バックエンドAPI | MVPでは Firebase を使い、認証とデータ管理をシンプルに構築するため |
-| PostgreSQL | 今回は Firestore を採用し、MVPの実装速度とリアルタイム性を優先するため |
-| Docker | 初期MVPではローカル実行環境の複雑さを抑えるため |
-| AWS本番構成 | 今回はアプリ設計、実装、テストに集中するため |
-| 複雑なUIライブラリ | MVPでは画面数が少なく、基本的なReact実装で十分なため |
-| GraphQL | MVPではデータ取得要件が単純であり、Firestore SDKで対応できるため |
-| Cloud Functions | 初期MVPではサーバー側の独自処理を最小限にするため |
+| 技術・構成          | 採用しない理由                                                         |
+| ------------------- | ---------------------------------------------------------------------- |
+| 独自バックエンドAPI | MVPでは Firebase を使い、認証とデータ管理をシンプルに構築するため      |
+| PostgreSQL          | 今回は Firestore を採用し、MVPの実装速度とリアルタイム性を優先するため |
+| Docker              | 初期MVPではローカル実行環境の複雑さを抑えるため                        |
+| AWS本番構成         | 今回はアプリ設計、実装、テストに集中するため                           |
+| 複雑なUIライブラリ  | MVPでは画面数が少なく、基本的なReact実装で十分なため                   |
+| GraphQL             | MVPではデータ取得要件が単純であり、Firestore SDKで対応できるため       |
+| Cloud Functions     | 初期MVPではサーバー側の独自処理を最小限にするため                      |
 
 ## 技術構成の全体像
 
