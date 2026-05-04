@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function signedInUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isTenantMember(tenantId) {
+      return isSignedIn()
+        && signedInUser().data.tenantId == tenantId;
+    }
+
+    function isTenantAdmin(tenantId) {
+      return isTenantMember(tenantId)
+        && signedInUser().data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.id == userId
+        && request.resource.data.role in ['admin', 'member'];
+
+      allow update, delete: if false;
+    }
+
+    // Note:
+    // The current MVP searches tenants by joinCode on the client during signup.
+    // Strict tenant read rules conflict with unaffiliated users searching by joinCode.
+    // For local MVP testing, keep Firebase Console rules in test mode or temporarily
+    // allow constrained tenant lookup.
+    // Before production, move join-code verification to a trusted server-side flow
+    // such as Cloud Functions or a Next.js server endpoint with Firebase Admin SDK.
+
+    match /tenants/{tenantId} {
+      allow read: if isTenantMember(tenantId);
+
+      allow create: if isSignedIn()
+        && request.resource.data.id == tenantId
+        && request.resource.data.createdBy == request.auth.uid;
+
+      allow update, delete: if false;
+
+      match /channels/{channelId} {
+        allow read: if isTenantMember(tenantId);
+
+        allow create: if isTenantAdmin(tenantId)
+          && request.resource.data.id == channelId
+          && request.resource.data.tenantId == tenantId
+          && request.resource.data.createdBy == request.auth.uid;
+
+        allow update, delete: if false;
+
+        match /messages/{messageId} {
+          allow read: if isTenantMember(tenantId);
+
+          allow create: if isTenantMember(tenantId)
+            && request.resource.data.id == messageId
+            && request.resource.data.tenantId == tenantId
+            && request.resource.data.channelId == channelId
+            && request.resource.data.senderId == request.auth.uid;
+
+          allow update, delete: if false;
+        }
+      }
+    }
+  }
+}
