@@ -29,7 +29,7 @@ MVPでは、以下の機能を実装対象とします。
 ## 技術スタック
 
 - フロントエンド: Next.js / TypeScript
-- UI: React
+- UI: React / Tailwind CSS / shadcn/ui
 - 認証: Firebase Authentication
 - データベース: Cloud Firestore
 - テスト: Vitest
@@ -82,6 +82,13 @@ Firebase Console の以下から値を確認できます。
 ```
 
 `measurementId` は Firebase Analytics 用の値です。現時点では Analytics を使わないため不要です。
+
+### UI コンポーネント
+
+このプロジェクトでは Tailwind CSS と shadcn/ui を使用します。
+
+shadcn/ui の設定は `components.json` にあります。  
+UI コンポーネントは `src/components/ui/` 配下に配置します。
 
 ### Firebase Authentication
 
@@ -151,14 +158,28 @@ npx vitest run
 - Vitest による単体テスト
 - Firestore Security Rules 初期方針
 
+## Phase 2 で実装済みの内容
+
+- 認証後画面の共通レイアウト
+- 所属テナント名とログインユーザー情報の表示
+- チャンネル一覧表示
+- 管理者ユーザー向けチャンネル作成
+- 一般ユーザー向けチャンネル作成フォーム非表示
+- チャンネル詳細表示
+- メッセージ一覧表示
+- メッセージ投稿
+- 投稿者名と投稿日時の表示
+- テナント情報表示
+- 管理者ユーザーのみ参加コード表示
+- Tailwind CSS / shadcn/ui による基本 UI 整備
+
 ## 現在の主な画面
 
 | URL | 概要 |
 |---|---|
+| `/` | 認証状態に応じて `/login` または `/channels` へ遷移 |
 | `/signup` | 新規テナント作成または参加コードによるユーザー登録 |
 | `/login` | メールアドレスとパスワードによるログイン |
-| `/channels` | 認証後のチャンネル一覧プレースホルダー |
-| `/channels/[channelId]` | 認証後のチャンネル詳細プレースホルダー |
-| `/tenant` | 認証後のテナント情報プレースホルダー |
-
-チャンネル一覧、チャンネル詳細、テナント情報の本格的な画面実装は Phase 2 で行います。
+| `/channels` | 所属テナント内のチャンネル一覧とチャンネル作成 |
+| `/channels/[channelId]` | チャンネル詳細、メッセージ一覧、メッセージ投稿 |
+| `/tenant` | 所属テナント情報とユーザー情報の表示 |

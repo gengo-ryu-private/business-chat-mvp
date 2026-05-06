@@ -26,6 +26,28 @@ export async function createMessage(input: CreateMessageInput): Promise<void> {
     );
 }
 
+export async function createMessageWithAutoId(
+    input: Omit<CreateMessageInput, 'id'>,
+): Promise<string> {
+    const messageRef = doc(
+        collection(
+            db,
+            'tenants',
+            input.tenantId,
+            'channels',
+            input.channelId,
+            'messages',
+        ),
+    );
+
+    await createMessage({
+        ...input,
+        id: messageRef.id,
+    });
+
+    return messageRef.id;
+}
+
 export async function getMessages(
     tenantId: string,
     channelId: string,

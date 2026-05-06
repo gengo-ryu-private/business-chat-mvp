@@ -8,6 +8,21 @@ import { GuestGuard } from '@/features/auth/GuestGuard';
 import { loginWithEmail } from '@/lib/auth/auth';
 import { isRequired, isValidEmail } from '@/utils/validation';
 
+import {
+    Alert,
+    AlertDescription,
+} from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
 export default function LoginPage() {
     return (
         <GuestGuard>
@@ -57,43 +72,65 @@ function LoginForm() {
     }
 
     return (
-        <main>
-            <h1>ログイン</h1>
+        <main className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>ログイン</CardTitle>
+                    <CardDescription>
+                        登録済みのメールアドレスとパスワードでログインします。
+                    </CardDescription>
+                </CardHeader>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="email">メールアドレス</label>
-                    <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        autoComplete="email"
-                    />
-                </div>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">メールアドレス</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
+                                autoComplete="email"
+                            />
+                        </div>
 
-                <div>
-                    <label htmlFor="password">パスワード</label>
-                    <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                        autoComplete="current-password"
-                    />
-                </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="password">パスワード</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
+                                autoComplete="current-password"
+                            />
+                        </div>
 
-                {errorMessage && <p role="alert">{errorMessage}</p>}
+                        {errorMessage && (
+                            <Alert variant="destructive">
+                                <AlertDescription>{errorMessage}</AlertDescription>
+                            </Alert>
+                        )}
 
-                <button type="submit" disabled={submitting}>
-                    {submitting ? 'ログイン中...' : 'ログイン'}
-                </button>
-            </form>
+                        <Button type="submit" disabled={submitting} className="w-full">
+                            {submitting ? 'ログイン中...' : 'ログイン'}
+                        </Button>
+                    </form>
 
-            <p>
-                アカウントをお持ちでない方は{' '}
-                <Link href="/signup">新規登録</Link>
-            </p>
+                    <p className="mt-6 text-center text-sm text-muted-foreground">
+                        アカウントをお持ちでない方は{' '}
+                        <Link
+                            href="/signup"
+                            className="font-medium text-foreground underline-offset-4 hover:underline"
+                        >
+                            新規登録
+                        </Link>
+                    </p>
+                </CardContent>
+            </Card>
         </main>
     );
 }
