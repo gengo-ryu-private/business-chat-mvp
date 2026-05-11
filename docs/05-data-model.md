@@ -226,15 +226,32 @@ Message
 
 ## ユーザー登録時のデータ作成
 
+Phase 3 の要件・設計再確認により、登録時のデータ作成は Next.js Route Handler と Firebase Admin SDK で行う方針とする。
+
+理由は、参加コード検索、`role` の決定、`tenantId` の紐付けをクライアント側の自己申告に依存させないためである。
+
+通常のチャンネル取得、チャンネル作成、メッセージ投稿などは Firebase Client SDK と Firestore Security Rules で制御する。
+一方で、ユーザー登録時の以下の処理は権限の根拠を作る処理であるため、サーバー側に集約する。
+
+- Firebase Authentication ユーザーの作成
+- 新規テナント作成
+- 参加コードによるテナント検索
+- `users/{userId}` の作成
+- `admin` / `member` の決定
+- ユーザーとテナントの紐付け
+
 ### 新規テナントを作成する場合
 
 新規テナントを作成してユーザー登録する場合、以下のデータを作成する。
 
-1. Firebase Authentication にユーザーを作成する
-2. `tenants/{tenantId}` を作成する
-3. `users/{userId}` を作成する
+1. ブラウザから Next.js Route Handler にユーザー名、メールアドレス、パスワード、テナント名を送信する
+2. Route Handler で入力値を検証する
+3. Firebase Admin SDK で Firebase Authentication にユーザーを作成する
+4. Route Handler で `tenants/{tenantId}` を作成する
+5. Route Handler で `users/{userId}` を作成する
 
-この場合、ユーザーの `role` は `admin` とする。
+この場合、ユーザーの `role` は Route Handler 側で `admin` に固定する。
+`tenantId`、`joinCode`、`createdBy` もクライアントから受け取らず、Route Handler 側で決定する。
 
 ### 作成する users の例
 
@@ -267,11 +284,14 @@ Message
 
 参加コードを使って既存テナントに参加する場合、以下のデータを作成する。
 
-1. Firebase Authentication にユーザーを作成する
-2. 入力された参加コードに一致するテナントを検索する
-3. `users/{userId}` を作成する
+1. ブラウザから Next.js Route Handler にユーザー名、メールアドレス、パスワード、参加コードを送信する
+2. Route Handler で入力値を検証する
+3. Route Handler が Firebase Admin SDK で参加コードに一致するテナントを検索する
+4. Firebase Admin SDK で Firebase Authentication にユーザーを作成する
+5. Route Handler で `users/{userId}` を作成する
 
-この場合、ユーザーの `role` は `member` とする。
+この場合、ユーザーの `role` は Route Handler 側で `member` に固定する。
+`tenantId` は参加コード検索で見つかったテナントから決定し、クライアントからは受け取らない。
 
 ### 作成する users の例
 

@@ -32,9 +32,10 @@ MVPでは、以下の機能を実装対象とします。
 - UI: React / Tailwind CSS / shadcn/ui
 - 認証: Firebase Authentication
 - データベース: Cloud Firestore
+- サーバー側処理: Next.js Route Handler / Firebase Admin SDK
 - テスト: Vitest
 
-React Testing Library と Playwright は、画面実装が進む Phase 2 以降で導入します。
+React Testing Library と Playwright は、今後の Phase 3 後続作業で導入予定です。
 
 ## ドキュメント
 
@@ -69,9 +70,13 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
 ```
 
-Firebase Console の以下から値を確認できます。
+`NEXT_PUBLIC_` で始まる値は Firebase Client SDK 用です。
+Firebase Console の以下から確認できます。
 
 ```text
 プロジェクト設定
@@ -83,11 +88,36 @@ Firebase Console の以下から値を確認できます。
 
 `measurementId` は Firebase Analytics 用の値です。現時点では Analytics を使わないため不要です。
 
+`FIREBASE_PROJECT_ID`、`FIREBASE_CLIENT_EMAIL`、`FIREBASE_PRIVATE_KEY` は Firebase Admin SDK 用です。
+Firebase Console の以下からサービスアカウントキーを生成し、ダウンロードした JSON の値を設定します。
+
+```text
+プロジェクト設定
+→ サービス アカウント
+→ Firebase Admin SDK
+→ 新しい秘密鍵の生成
+```
+
+JSON との対応は以下です。
+
+```env
+FIREBASE_PROJECT_ID=project_id の値
+FIREBASE_CLIENT_EMAIL=client_email の値
+FIREBASE_PRIVATE_KEY=private_key の値
+```
+
+`FIREBASE_PRIVATE_KEY` は秘密情報です。Git にコミットせず、`NEXT_PUBLIC_` も付けません。
+`.env.local` では以下のようにクォートで囲み、改行は `\n` の形で保持します。
+
+```env
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
 ### UI コンポーネント
 
 このプロジェクトでは Tailwind CSS と shadcn/ui を使用します。
 
-shadcn/ui の設定は `components.json` にあります。  
+shadcn/ui の設定は `components.json` にあります。
 UI コンポーネントは `src/components/ui/` 配下に配置します。
 
 ### Firebase Authentication
@@ -113,7 +143,26 @@ Firestore Database
 ```
 
 開発中はテストモードで動作確認できます。
-本番公開前には `firestore.rules` をもとに Security Rules を設定します。
+ただし、最終的な権限制御は `firestore.rules` をもとに Security Rules を設定します。
+
+### 登録・参加処理のサーバー側実行
+
+Phase 3 の要件・設計再確認により、ユーザー登録とテナント参加処理は Next.js Route Handler と Firebase Admin SDK に移行しています。
+
+対象 API は以下です。
+
+| API | 役割 |
+|---|---|
+| `POST /api/signup/create-tenant` | Firebase Auth ユーザー、テナント、admin ユーザー情報を作成 |
+| `POST /api/signup/join-tenant` | 参加コードを検証し、Firebase Auth ユーザーと member ユーザー情報を作成 |
+
+この構成にした理由は、参加コード検索、`role`、`tenantId`、`createdBy` の決定をブラウザ側の自己申告に依存させないためです。
+
+通常のチャンネル作成、メッセージ投稿、一覧取得は Firebase Client SDK と Firestore Security Rules で制御します。
+一方で、権限の根拠を作る登録・参加処理はサーバー側で行います。
+
+Route Handler と Firebase Admin SDK を使うため、このアプリは静的ホスティングのみでは完結しません。
+ローカル開発では `npm run dev`、本番運用では Next.js のサーバー実行環境が必要です。
 
 ### 開発サーバー起動
 
@@ -173,6 +222,18 @@ npx vitest run
 - 管理者ユーザーのみ参加コード表示
 - Tailwind CSS / shadcn/ui による基本 UI 整備
 
+## Phase 3 で実装済みの内容
+
+- 要件・設計・実装の再確認
+- 参加コード検索と Firestore Security Rules の整合性確認
+- 登録・参加処理の Next.js Route Handler 移行
+- Firebase Admin SDK 導入
+- サーバー側での Firebase Authentication ユーザー作成
+- サーバー側での `admin` / `member` 決定
+- クライアントからの `users` / `tenants` 直接作成を禁止
+- Firestore Security Rules の強化
+- 登録 API の入力検証・保存データ生成に対する単体テスト追加
+
 ## 現在の主な画面
 
 | URL | 概要 |
@@ -183,3 +244,35 @@ npx vitest run
 | `/channels` | 所属テナント内のチャンネル一覧とチャンネル作成 |
 | `/channels/[channelId]` | チャンネル詳細、メッセージ一覧、メッセージ投稿 |
 | `/tenant` | 所属テナント情報とユーザー情報の表示 |
+
+## 権限制御の考え方
+
+このMVPでは、処理の種類によって責務を分けています。
+
+```text
+登録・参加
+  → Next.js Route Handler + Firebase Admin SDK
+
+ログイン後の通常操作
+  → Firebase Client SDK + Firestore Security Rules
+```
+
+登録・参加処理では、サーバー側で Firebase Authentication ユーザーと Firestore のアプリ用ユーザー情報を作成します。
+これにより、`role` や `tenantId` をクライアントが自由に指定できない構成にしています。
+
+Firestore Security Rules では、ログイン後の通常操作を制御します。
+
+- 自分の `users/{userId}` のみ参照可能
+- 所属テナントのみ参照可能
+- クライアントから `users` / `tenants` は作成不可
+- 管理者のみチャンネル作成可能
+- 所属テナント内の既存チャンネルにのみメッセージ投稿可能
+- チャンネル・メッセージ作成時の主要フィールドを検証
+
+## 今後の拡張候補
+
+- React Testing Library による主要フォーム・表示制御のコンポーネントテスト
+- Playwright による登録、ログイン、チャンネル作成、メッセージ投稿のE2Eテスト
+- Firebase Emulator を使った Firestore Security Rules テスト
+- メッセージ検索、通知、ファイル添付、既読管理などのチャット機能拡張
+- 複数テナント所属や複数管理者への対応

@@ -4,10 +4,10 @@
 
 このドキュメントでは、業務用チャットアプリMVPで使用する技術構成を整理する。
 
-`docs/02-users.md` では、小規模組織における業務連絡の課題を整理した。  
-`docs/03-scope.md` では、その課題に対してMVPで対応する範囲を定義した。  
-`docs/04-requirements.md` では、MVPで実装する機能要件を整理した。  
-`docs/05-data-model.md` では、Firestore を前提としたデータ構造を整理した。  
+`docs/02-users.md` では、小規模組織における業務連絡の課題を整理した。
+`docs/03-scope.md` では、その課題に対してMVPで対応する範囲を定義した。
+`docs/04-requirements.md` では、MVPで実装する機能要件を整理した。
+`docs/05-data-model.md` では、Firestore を前提としたデータ構造を整理した。
 `docs/06-screens.md` では、ユーザーが操作する画面を整理した。
 
 このドキュメントでは、それらを実現するために採用する技術と、各技術の役割を明確にする。
@@ -30,9 +30,11 @@
 | 分類                 | 使用技術                | 主な役割                                         |
 | -------------------- | ----------------------- | ------------------------------------------------ |
 | フレームワーク       | Next.js                 | 画面実装、ルーティング、アプリ全体の構成         |
+| サーバー側処理       | Next.js Route Handler   | 登録・参加処理、権限境界となる処理               |
 | UI                   | React                   | コンポーネントベースの画面構築                   |
 | 言語                 | TypeScript              | 型安全な実装                                     |
 | 認証                 | Firebase Authentication | ユーザー登録、ログイン、ログアウト               |
+| 管理者SDK            | Firebase Admin SDK      | サーバー側での認証ユーザー作成とFirestore操作    |
 | データベース         | Firestore               | ユーザー、テナント、チャンネル、メッセージの管理 |
 | 単体テスト           | Vitest                  | バリデーション、権限判定、データ整形処理のテスト |
 | コンポーネントテスト | React Testing Library   | フォーム、一覧、表示制御のテスト                 |
@@ -51,7 +53,27 @@ MVPでは、以下の役割を担う。
 - 認証状態に応じた画面制御
 - Firebase Authentication との連携
 - Firestore との連携
-- 将来的なAPI実装やサーバー側処理への拡張
+- 登録・参加処理を行う Route Handler の実装
+
+### Next.js Route Handler
+
+Phase 3 の要件・設計再確認により、登録・参加処理に限って Next.js Route Handler を採用する。
+
+対象は以下の処理とする。
+
+- 新規テナント作成を伴うユーザー登録
+- 参加コードによる既存テナント参加
+- Firebase Authentication ユーザーの作成
+- `users/{userId}` の作成
+- `admin` / `member` の決定
+- 参加コード検索
+
+これらは権限の根拠を作る処理であり、クライアント側の自己申告に依存させると `role` や `tenantId` の不正指定を防ぎにくい。
+
+そのため、登録・参加処理は Route Handler に集約し、通常のチャンネル取得、チャンネル作成、メッセージ投稿などは引き続き Firebase Client SDK と Firestore Security Rules で扱う。
+
+Route Handler を利用するため、このアプリは静的ホスティングのみでは完結しない。
+ローカル開発では Next.js dev server、本番運用では Next.js のサーバー実行環境が必要になる。
 
 ## React
 
@@ -134,6 +156,27 @@ MVPでは、以下の機能を実装する。
 
 Firebase Authentication では認証情報を管理し、アプリ内で使用するユーザー名、所属テナント、ユーザー種別などは Firestore の `users` コレクションで管理する。
 
+Phase 3 以降、ユーザー登録時の Firebase Authentication ユーザー作成は Firebase Client SDK ではなく、Next.js Route Handler から Firebase Admin SDK を使って行う。
+登録成功後、ブラウザ側でメールアドレスとパスワードを使ってログインする。
+
+## Firebase Admin SDK
+
+Firebase Admin SDK は、Next.js Route Handler から Firebase Authentication と Firestore を管理者権限で操作するために使用する。
+
+MVPでは、以下の処理に限定して使用する。
+
+- Firebase Authentication ユーザーの作成
+- 登録失敗時の Firebase Authentication ユーザー削除
+- 新規テナント作成
+- 参加コードによるテナント検索
+- アプリ用ユーザー情報の作成
+
+Firebase Admin SDK は Firestore Security Rules をバイパスする。
+そのため、Admin SDK を使う Route Handler 側で、入力バリデーション、作成する `role` の固定、`tenantId` の決定、途中失敗時の後始末を行う。
+
+Admin SDK 用の秘密情報はブラウザに公開しない。
+`NEXT_PUBLIC_` で始まる環境変数には設定せず、サーバー側専用の環境変数として扱う。
+
 ## Firestore
 
 Firestore は、アプリ内データの管理に使用する。
@@ -166,6 +209,8 @@ Firestore Security Rules は、認証状態や所属テナントに応じたア�
 MVPでは、以下を制御する。
 
 - ログインしていないユーザーはデータを読み書きできない
+- クライアントから `users/{userId}` を直接作成できない
+- クライアントから `tenants/{tenantId}` を直接作成できない
 - ユーザーは自分が所属するテナントのデータだけを参照できる
 - ユーザーは所属テナント内のチャンネルだけを参照できる
 - ユーザーは所属テナント内のメッセージだけを参照できる
@@ -173,6 +218,8 @@ MVPでは、以下を制御する。
 - 一般ユーザーはチャンネル作成を行えない
 
 画面上の表示制御だけでなく、データアクセスの制御も行うことで、業務用アプリとして必要な基本的な権限制御を示す。
+
+登録・参加処理は Route Handler と Firebase Admin SDK が担当するため、Firestore Security Rules は主にログイン後の通常操作を制御する役割を担う。
 
 ## テストツール
 
@@ -242,38 +289,38 @@ MVPでは、以下を管理対象とする。
 
 ## 機能と使用技術の対応
 
-| 機能                 | 使用技術                                              |
-| -------------------- | ----------------------------------------------------- |
-| ユーザー登録         | Next.js / React / Firebase Authentication / Firestore |
-| ログイン             | Next.js / React / Firebase Authentication             |
-| ログアウト           | Firebase Authentication                               |
-| 新規テナント作成     | Firestore                                             |
-| 既存テナント参加     | Firestore                                             |
-| 所属テナント情報表示 | Firestore                                             |
-| チャンネル作成       | Firestore / Firestore Security Rules                  |
-| チャンネル一覧表示   | Firestore                                             |
-| チャンネル詳細表示   | Next.js / Firestore                                   |
-| メッセージ投稿       | Firestore / Firestore Security Rules                  |
-| メッセージ一覧表示   | Firestore                                             |
-| 認証制御             | Firebase Authentication / Next.js                     |
-| 権限制御             | Firestore / Firestore Security Rules / TypeScript     |
-| 単体テスト           | Vitest                                                |
-| コンポーネントテスト | React Testing Library                                 |
-| E2Eテスト            | Playwright                                            |
+| 機能                 | 使用技術                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| ユーザー登録         | Next.js / React / Route Handler / Firebase Admin SDK / Firebase Authentication / Firestore |
+| ログイン             | Next.js / React / Firebase Authentication                                                  |
+| ログアウト           | Firebase Authentication                                                                    |
+| 新規テナント作成     | Route Handler / Firebase Admin SDK / Firestore                                             |
+| 既存テナント参加     | Route Handler / Firebase Admin SDK / Firestore                                             |
+| 所属テナント情報表示 | Firestore                                                                                  |
+| チャンネル作成       | Firestore / Firestore Security Rules                                                       |
+| チャンネル一覧表示   | Firestore                                                                                  |
+| チャンネル詳細表示   | Next.js / Firestore                                                                        |
+| メッセージ投稿       | Firestore / Firestore Security Rules                                                       |
+| メッセージ一覧表示   | Firestore                                                                                  |
+| 認証制御             | Firebase Authentication / Next.js                                                          |
+| 権限制御             | Firestore / Firestore Security Rules / TypeScript                                          |
+| 単体テスト           | Vitest                                                                                     |
+| コンポーネントテスト | React Testing Library                                                                      |
+| E2Eテスト            | Playwright                                                                                 |
 
-## 採用しない技術・構成
+## 採用を限定する技術・構成
 
-MVPでは、以下の技術や構成は採用しない。
+MVPでは、以下の技術や構成は採用しない、または採用範囲を限定する。
 
-| 技術・構成          | 採用しない理由                                                         |
-| ------------------- | ---------------------------------------------------------------------- |
-| 独自バックエンドAPI | MVPでは Firebase を使い、認証とデータ管理をシンプルに構築するため      |
-| PostgreSQL          | 今回は Firestore を採用し、MVPの実装速度とリアルタイム性を優先するため |
-| Docker              | 初期MVPではローカル実行環境の複雑さを抑えるため                        |
-| AWS本番構成         | 今回はアプリ設計、実装、テストに集中するため                           |
-| 複雑なUIライブラリ  | MVPでは画面数が少なく、基本的なReact実装で十分なため                   |
-| GraphQL             | MVPではデータ取得要件が単純であり、Firestore SDKで対応できるため       |
-| Cloud Functions     | 初期MVPではサーバー側の独自処理を最小限にするため                      |
+| 技術・構成          | 方針                                                                             |
+| ------------------- | -------------------------------------------------------------------------------- |
+| 独自バックエンドAPI | 登録・参加処理に限り Next.js Route Handler を採用する                            |
+| PostgreSQL          | 今回は Firestore を採用し、MVPの実装速度とリアルタイム性を優先するため採用しない |
+| Docker              | 初期MVPではローカル実行環境の複雑さを抑えるため採用しない                        |
+| AWS本番構成         | 今回はアプリ設計、実装、テストに集中するため採用しない                           |
+| 複雑なUIライブラリ  | MVPでは画面数が少なく、基本的なReact実装で十分なため採用しない                   |
+| GraphQL             | MVPではデータ取得要件が単純であり、Firestore SDKで対応できるため採用しない       |
+| Cloud Functions     | サーバー側処理は Next.js Route Handler に集約するため採用しない                  |
 
 ## 技術構成の全体像
 
@@ -281,6 +328,8 @@ MVPでは、以下の技術や構成は採用しない。
 ユーザー
   ↓
 Next.js / React / TypeScript
+  ├─ 登録・参加 → Next.js Route Handler → Firebase Admin SDK
+  └─ 通常操作 → Firebase Client SDK
   ↓
 Firebase Authentication
   ↓

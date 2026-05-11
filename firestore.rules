@@ -20,41 +20,55 @@ service cloud.firestore {
         && signedInUser().data.role == 'admin';
     }
 
+    function signedInUserName() {
+      return signedInUser().data.displayName;
+    }
+
+    function hasOnlyFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isNonEmptyString(value) {
+      return value is string && value.size() > 0;
+    }
+
+    function isOptionalString(value) {
+      return !request.resource.data.keys().hasAny(['description']) || value is string;
+    }
+
     match /users/{userId} {
       allow read: if isSignedIn() && request.auth.uid == userId;
 
-      allow create: if isSignedIn()
-        && request.auth.uid == userId
-        && request.resource.data.id == userId
-        && request.resource.data.role in ['admin', 'member'];
-
-      allow update, delete: if false;
+      allow create, update, delete: if false;
     }
 
     // Note:
-    // The current MVP searches tenants by joinCode on the client during signup.
-    // Strict tenant read rules conflict with unaffiliated users searching by joinCode.
-    // For local MVP testing, keep Firebase Console rules in test mode or temporarily
-    // allow constrained tenant lookup.
-    // Before production, move join-code verification to a trusted server-side flow
-    // such as Cloud Functions or a Next.js server endpoint with Firebase Admin SDK.
+    // Signup and tenant joining are handled by Next.js Route Handlers with
+    // Firebase Admin SDK. Client SDK access does not need to create users or
+    // tenants, nor search tenants by joinCode.
 
     match /tenants/{tenantId} {
       allow read: if isTenantMember(tenantId);
 
-      allow create: if isSignedIn()
-        && request.resource.data.id == tenantId
-        && request.resource.data.createdBy == request.auth.uid;
-
-      allow update, delete: if false;
+      allow create, update, delete: if false;
 
       match /channels/{channelId} {
         allow read: if isTenantMember(tenantId);
 
         allow create: if isTenantAdmin(tenantId)
+          && hasOnlyFields(['id', 'tenantId', 'name', 'description', 'createdBy', 'createdAt', 'updatedAt'])
+          && hasRequiredFields(['id', 'tenantId', 'name', 'createdBy', 'createdAt', 'updatedAt'])
           && request.resource.data.id == channelId
           && request.resource.data.tenantId == tenantId
-          && request.resource.data.createdBy == request.auth.uid;
+          && request.resource.data.createdBy == request.auth.uid
+          && isNonEmptyString(request.resource.data.name)
+          && isOptionalString(request.resource.data.description)
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
 
         allow update, delete: if false;
 
@@ -62,10 +76,16 @@ service cloud.firestore {
           allow read: if isTenantMember(tenantId);
 
           allow create: if isTenantMember(tenantId)
+            && exists(/databases/$(database)/documents/tenants/$(tenantId)/channels/$(channelId))
+            && hasOnlyFields(['id', 'tenantId', 'channelId', 'body', 'senderId', 'senderName', 'createdAt'])
+            && hasRequiredFields(['id', 'tenantId', 'channelId', 'body', 'senderId', 'senderName', 'createdAt'])
             && request.resource.data.id == messageId
             && request.resource.data.tenantId == tenantId
             && request.resource.data.channelId == channelId
-            && request.resource.data.senderId == request.auth.uid;
+            && request.resource.data.senderId == request.auth.uid
+            && request.resource.data.senderName == signedInUserName()
+            && isNonEmptyString(request.resource.data.body)
+            && request.resource.data.createdAt == request.time;
 
           allow update, delete: if false;
         }

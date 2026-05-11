@@ -1,11 +1,4 @@
-import { deleteUser } from 'firebase/auth';
-import { collection, doc } from 'firebase/firestore';
-
-import { signUpWithEmail } from '@/lib/auth/auth';
-import { db } from '@/lib/firebase/client';
-import { createTenant, findTenantByJoinCode } from '@/lib/firestore/tenants';
-import { createAppUser } from '@/lib/firestore/users';
-import { generateJoinCode } from '@/utils/join-code';
+import { loginWithEmail } from '@/lib/auth/auth';
 
 type SignUpBaseInput = {
     displayName: string;
@@ -21,57 +14,41 @@ type SignUpWithJoinCodeInput = SignUpBaseInput & {
     joinCode: string;
 };
 
+type SignUpApiResponse = {
+    ok: boolean;
+    message?: string;
+};
+
 export async function signUpWithNewTenant(
     input: SignUpWithNewTenantInput,
 ): Promise<string> {
-    const authUser = await signUpWithEmail(input.email, input.password);
-    const tenantRef = doc(collection(db, 'tenants'));
-    const tenantId = tenantRef.id;
+    await requestSignUp('/api/signup/create-tenant', input);
+    const user = await loginWithEmail(input.email, input.password);
 
-    try {
-        await createTenant({
-            id: tenantId,
-            name: input.tenantName,
-            joinCode: generateJoinCode(),
-            createdBy: authUser.uid,
-        });
-
-        await createAppUser({
-            id: authUser.uid,
-            displayName: input.displayName,
-            email: input.email,
-            tenantId,
-            role: 'admin',
-        });
-    } catch (error) {
-        await deleteUser(authUser);
-        throw error;
-    }
-    return authUser.uid;
+    return user.uid;
 }
 
 export async function signUpWithJoinCode(
     input: SignUpWithJoinCodeInput,
 ): Promise<string> {
-    const tenant = await findTenantByJoinCode(input.joinCode);
+    await requestSignUp('/api/signup/join-tenant', input);
+    const user = await loginWithEmail(input.email, input.password);
 
-    if (!tenant) {
-        throw new Error('参加コードに一致するテナントが見つかりません。');
+    return user.uid;
+}
+
+async function requestSignUp(endpoint: string, input: object): Promise<void> {
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    const data = (await response.json()) as SignUpApiResponse;
+
+    if (!response.ok || !data.ok) {
+        throw new Error(data.message ?? 'ユーザー登録に失敗しました。');
     }
-
-    const authUser = await signUpWithEmail(input.email, input.password);
-
-    try {
-        await createAppUser({
-            id: authUser.uid,
-            displayName: input.displayName,
-            email: input.email,
-            tenantId: tenant.id,
-            role: 'member',
-        });
-    } catch (error) {
-        await deleteUser(authUser);
-        throw error;
-    }
-    return authUser.uid;
 }
