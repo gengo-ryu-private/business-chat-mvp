@@ -233,6 +233,7 @@ npx vitest run
 - クライアントからの `users` / `tenants` 直接作成を禁止
 - Firestore Security Rules の強化
 - 登録 API の入力検証・保存データ生成に対する単体テスト追加
+- チャンネル詳細画面のメッセージ一覧を Firestore リアルタイム購読に対応
 
 ## 現在の主な画面
 
@@ -242,7 +243,7 @@ npx vitest run
 | `/signup` | 新規テナント作成または参加コードによるユーザー登録 |
 | `/login` | メールアドレスとパスワードによるログイン |
 | `/channels` | 所属テナント内のチャンネル一覧とチャンネル作成 |
-| `/channels/[channelId]` | チャンネル詳細、メッセージ一覧、メッセージ投稿 |
+| `/channels/[channelId]` | チャンネル詳細、リアルタイムメッセージ一覧、メッセージ投稿 |
 | `/tenant` | 所属テナント情報とユーザー情報の表示 |
 
 ## 権限制御の考え方
@@ -274,5 +275,6 @@ Firestore Security Rules では、ログイン後の通常操作を制御しま�
 - React Testing Library による主要フォーム・表示制御のコンポーネントテスト
 - Playwright による登録、ログイン、チャンネル作成、メッセージ投稿のE2Eテスト
 - Firebase Emulator を使った Firestore Security Rules テスト
+- メッセージリアルタイム表示を含むE2Eテスト
 - メッセージ検索、通知、ファイル添付、既読管理などのチャット機能拡張
 - 複数テナント所属や複数管理者への対応

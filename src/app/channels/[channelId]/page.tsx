@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, use, useCallback, useEffect, useState } from 'react';
+import { FormEvent, use, useEffect, useState } from 'react';
 
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import { AuthGuard } from '@/features/auth/AuthGuard';
@@ -11,7 +11,7 @@ import { formatDateTime } from '@/utils/date';
 import { isBlankMessage } from '@/utils/validation';
 import {
     createMessageWithAutoId,
-    getMessages,
+    subscribeMessages,
 } from '@/lib/firestore/messages';
 
 import {
@@ -45,7 +45,6 @@ type ChannelDetailState = {
     loadingMessages: boolean;
     channelErrorMessage: string;
     messageErrorMessage: string;
-    refreshMessages: () => Promise<void>;
 };
 
 function useChannelDetail(channelId: string): ChannelDetailState {
@@ -58,27 +57,10 @@ function useChannelDetail(channelId: string): ChannelDetailState {
     const [channelErrorMessage, setChannelErrorMessage] = useState('');
     const [messageErrorMessage, setMessageErrorMessage] = useState('');
 
-    const refreshMessages = useCallback(async () => {
-        if (!appUser) {
-            setMessages([]);
-            setLoadingMessages(false);
-            return;
-        }
-
-        try {
-            setLoadingMessages(true);
-            setMessageErrorMessage('');
-
-            const fetchedMessages = await getMessages(appUser.tenantId, channelId);
-            setMessages(fetchedMessages);
-        } catch {
-            setMessageErrorMessage('メッセージ一覧の取得に失敗しました。');
-        } finally {
-            setLoadingMessages(false);
-        }
-    }, [appUser, channelId]);
-
     useEffect(() => {
+        let unsubscribeMessages: (() => void) | undefined;
+        let cancelled = false;
+
         async function fetchChannelDetail() {
             if (!appUser) {
                 setChannel(null);
@@ -99,27 +81,64 @@ function useChannelDetail(channelId: string): ChannelDetailState {
                     channelId,
                 );
 
+                if (cancelled) {
+                    return;
+                }
+
                 if (!fetchedChannel) {
                     setChannelErrorMessage('チャンネルが見つかりません。');
                     setChannel(null);
                     setMessages([]);
+                    setLoadingChannel(false);
+                    setLoadingMessages(false);
                     return;
                 }
 
                 setChannel(fetchedChannel);
+                setLoadingChannel(false);
 
-                await refreshMessages();
+                unsubscribeMessages = subscribeMessages(
+                    appUser.tenantId,
+                    channelId,
+                    (fetchedMessages) => {
+                        if (cancelled) {
+                            return;
+                        }
+
+                        setMessages(fetchedMessages);
+                        setLoadingMessages(false);
+                    },
+                    () => {
+                        if (cancelled) {
+                            return;
+                        }
+
+                        setMessages([]);
+                        setMessageErrorMessage(
+                            'メッセージ一覧の取得に失敗しました。',
+                        );
+                        setLoadingMessages(false);
+                    },
+                );
             } catch {
+                if (cancelled) {
+                    return;
+                }
+
                 setChannelErrorMessage('チャンネル情報の取得に失敗しました。');
                 setMessageErrorMessage('メッセージ一覧の取得に失敗しました。');
-            } finally {
                 setLoadingChannel(false);
                 setLoadingMessages(false);
             }
         }
 
         fetchChannelDetail();
-    }, [appUser, channelId, refreshMessages]);
+
+        return () => {
+            cancelled = true;
+            unsubscribeMessages?.();
+        };
+    }, [appUser, channelId]);
 
     return {
         channel,
@@ -128,7 +147,6 @@ function useChannelDetail(channelId: string): ChannelDetailState {
         loadingMessages,
         channelErrorMessage,
         messageErrorMessage,
-        refreshMessages,
     };
 }
 
@@ -140,9 +158,7 @@ function ChannelDetailContent({ channelId }: ChannelDetailContentProps) {
         loadingMessages,
         channelErrorMessage,
         messageErrorMessage,
-        refreshMessages,
     } = useChannelDetail(channelId);
-
 
     return (
         <main className="space-y-6">
@@ -166,7 +182,7 @@ function ChannelDetailContent({ channelId }: ChannelDetailContentProps) {
                         loading={loadingMessages}
                         errorMessage={messageErrorMessage}
                     />
-                    <MessagePostForm channelId={channelId} onPosted={refreshMessages} />
+                    <MessagePostForm channelId={channelId} />
                 </>
             )}
         </main>
@@ -270,10 +286,9 @@ function MessageList({ messages, loading, errorMessage }: MessageListProps) {
 
 type MessagePostFormProps = {
     channelId: string;
-    onPosted: () => Promise<void>;
 };
 
-function MessagePostForm({ channelId, onPosted }: MessagePostFormProps) {
+function MessagePostForm({ channelId }: MessagePostFormProps) {
     const { appUser } = useAuth();
 
     const [messageBody, setMessageBody] = useState('');
@@ -306,7 +321,6 @@ function MessagePostForm({ channelId, onPosted }: MessagePostFormProps) {
             });
 
             setMessageBody('');
-            await onPosted();
         } catch {
             setErrorMessage('メッセージ投稿に失敗しました。');
         } finally {

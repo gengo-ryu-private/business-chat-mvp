@@ -1,10 +1,12 @@
 import {
     collection,
     doc,
-    getDocs,
+    onSnapshot,
     orderBy,
     query,
     setDoc,
+    type FirestoreError,
+    type Unsubscribe,
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase/client';
@@ -48,10 +50,12 @@ export async function createMessageWithAutoId(
     return messageRef.id;
 }
 
-export async function getMessages(
+export function subscribeMessages(
     tenantId: string,
     channelId: string,
-): Promise<Message[]> {
+    onNext: (messages: Message[]) => void,
+    onError: (error: FirestoreError) => void,
+): Unsubscribe {
     const messagesRef = collection(
         db,
         'tenants',
@@ -62,7 +66,19 @@ export async function getMessages(
     );
 
     const messagesQuery = query(messagesRef, orderBy('createdAt', 'asc'));
-    const snapshot = await getDocs(messagesQuery);
 
-    return snapshot.docs.map((docSnapshot) => docSnapshot.data() as Message);
+    return onSnapshot(
+        messagesQuery,
+        (snapshot) => {
+            onNext(
+                snapshot.docs.map(
+                    (docSnapshot) =>
+                        docSnapshot.data({
+                            serverTimestamps: 'estimate',
+                        }) as Message,
+                ),
+            );
+        },
+        onError,
+    );
 }
