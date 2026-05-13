@@ -33,9 +33,9 @@ MVPでは、以下の機能を実装対象とします。
 - 認証: Firebase Authentication
 - データベース: Cloud Firestore
 - サーバー側処理: Next.js Route Handler / Firebase Admin SDK
-- テスト: Vitest
+- テスト: Vitest / React Testing Library
 
-React Testing Library と Playwright は、今後の Phase 3 後続作業で導入予定です。
+Playwright は、今後の Phase 3 後続作業で導入予定です。
 
 ## ドキュメント
 
@@ -234,6 +234,9 @@ npx vitest run
 - Firestore Security Rules の強化
 - 登録 API の入力検証・保存データ生成に対する単体テスト追加
 - チャンネル詳細画面のメッセージ一覧を Firestore リアルタイム購読に対応
+- React Testing Library 導入
+- 主要フォーム・表示部品のコンポーネント分離
+- 主要フォーム・表示制御・メッセージ一覧のコンポーネントテスト追加
 
 ## 現在の主な画面
 
@@ -272,7 +275,6 @@ Firestore Security Rules では、ログイン後の通常操作を制御しま�
 
 ## 今後の拡張候補
 
-- React Testing Library による主要フォーム・表示制御のコンポーネントテスト
 - Playwright による登録、ログイン、チャンネル作成、メッセージ投稿のE2Eテスト
 - Firebase Emulator を使った Firestore Security Rules テスト
 - メッセージリアルタイム表示を含むE2Eテスト
