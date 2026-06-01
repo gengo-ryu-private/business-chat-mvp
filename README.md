@@ -33,9 +33,7 @@ MVPでは、以下の機能を実装対象とします。
 - 認証: Firebase Authentication
 - データベース: Cloud Firestore
 - サーバー側処理: Next.js Route Handler / Firebase Admin SDK
-- テスト: Vitest / React Testing Library
-
-Playwright は、今後の Phase 3 後続作業で導入予定です。
+- テスト: Vitest / React Testing Library / Playwright
 
 ## ドキュメント
 
@@ -73,6 +71,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 FIREBASE_PROJECT_ID=
 FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
+NEXT_PUBLIC_USE_FIREBASE_EMULATOR=
 ```
 
 `NEXT_PUBLIC_` で始まる値は Firebase Client SDK 用です。
@@ -112,6 +111,9 @@ FIREBASE_PRIVATE_KEY=private_key の値
 ```env
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```
+
+`NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true` は E2E テストなどで Firebase Emulator に接続する場合に使用します。
+通常のローカル開発で実 Firebase プロジェクトを使う場合は空のままで構いません。
 
 ### UI コンポーネント
 
@@ -190,6 +192,21 @@ npm run test
 npx vitest run
 ```
 
+E2E テストは Firebase Emulator と Playwright を使って実行します。
+
+```bash
+npm run test:e2e
+```
+
+初回実行前に Playwright のブラウザが未インストールの場合は、以下を実行します。
+
+```bash
+npx playwright install chromium
+```
+
+E2E では Auth Emulator と Firestore Emulator を起動し、テスト用 project ID `business-chat-mvp-e2e` を使用します。
+`playwright.config.ts` が E2E 用の Firebase 環境変数を dev server に渡すため、通常の `.env.local` を E2E 用に書き換える必要はありません。
+
 ## Phase 1 で実装済みの内容
 
 - Firebase Authentication 連携
@@ -237,6 +254,9 @@ npx vitest run
 - React Testing Library 導入
 - 主要フォーム・表示部品のコンポーネント分離
 - 主要フォーム・表示制御・メッセージ一覧のコンポーネントテスト追加
+- Playwright 導入
+- Firebase Emulator を使った E2E テスト設定
+- admin 登録、チャンネル作成、member 登録、メッセージ投稿、リアルタイム表示、認証制御の E2E テスト追加
 
 ## 現在の主な画面
 
@@ -275,8 +295,6 @@ Firestore Security Rules では、ログイン後の通常操作を制御しま�
 
 ## 今後の拡張候補
 
-- Playwright による登録、ログイン、チャンネル作成、メッセージ投稿のE2Eテスト
 - Firebase Emulator を使った Firestore Security Rules テスト
-- メッセージリアルタイム表示を含むE2Eテスト
 - メッセージ検索、通知、ファイル添付、既読管理などのチャット機能拡張
 - 複数テナント所属や複数管理者への対応

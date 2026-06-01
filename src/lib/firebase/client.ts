@@ -1,6 +1,10 @@
 import { getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+
+declare global {
+    var __businessChatFirebaseEmulatorsConnected: boolean | undefined;
+}
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -24,3 +28,14 @@ const app =
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+if (
+    process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' &&
+    !globalThis.__businessChatFirebaseEmulatorsConnected
+) {
+    connectAuthEmulator(auth, 'http://127.0.0.1:9099', {
+        disableWarnings: true,
+    });
+    connectFirestoreEmulator(db, '127.0.0.1', 8080);
+    globalThis.__businessChatFirebaseEmulatorsConnected = true;
+}

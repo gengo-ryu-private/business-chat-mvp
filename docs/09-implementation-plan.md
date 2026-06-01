@@ -435,8 +435,8 @@ Phase 3 の要件・設計再確認により、参加コード検索と `role` /
 
 事前に決めること:
 
-- E2Eテストで使用する Firebase プロジェクト
-- Firebase Emulator を使うか、テスト用 Firebase プロジェクトを使うか
+- E2Eテストでは Firebase Emulator を使用する
+- テスト用 project ID は `business-chat-mvp-e2e` とする
 - テストデータの作成・削除方法
 - 参加コードを持つ既存テナントとチャンネルの用意方法
 
