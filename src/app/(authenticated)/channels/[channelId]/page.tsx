@@ -2,11 +2,9 @@
 
 import { use, useEffect, useState } from 'react';
 
-import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import { ChannelSummary } from '@/components/messages/ChannelSummary';
 import { MessageList } from '@/components/messages/MessageList';
 import { MessagePostForm } from '@/components/messages/MessagePostForm';
-import { AuthGuard } from '@/features/auth/AuthGuard';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getChannel } from '@/lib/firestore/channels';
 import {
@@ -188,11 +186,5 @@ function ChannelDetailContent({ channelId }: ChannelDetailContentProps) {
 export default function ChannelDetailPage({ params }: ChannelDetailPageProps) {
     const { channelId } = use(params);
 
-    return (
-        <AuthGuard>
-            <AuthenticatedLayout>
-                <ChannelDetailContent channelId={channelId} />
-            </AuthenticatedLayout>
-        </AuthGuard>
-    );
+    return <ChannelDetailContent channelId={channelId} />;
 }

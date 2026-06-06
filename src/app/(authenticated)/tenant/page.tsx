@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
 import { TenantInfo } from '@/components/tenant/TenantInfo';
-import { AuthGuard } from '@/features/auth/AuthGuard';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getTenant } from '@/lib/firestore/tenants';
 import type { Tenant } from '@/types/models';
@@ -15,13 +13,7 @@ import {
 } from '@/components/ui/alert';
 
 export default function TenantPage() {
-    return (
-        <AuthGuard>
-            <AuthenticatedLayout>
-                <TenantContent />
-            </AuthenticatedLayout>
-        </AuthGuard>
-    );
+    return <TenantContent />;
 }
 
 function TenantContent() {

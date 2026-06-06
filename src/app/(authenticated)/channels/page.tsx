@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ChannelsPanel } from '@/components/channels/ChannelsPanel';
-import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
-import { AuthGuard } from '@/features/auth/AuthGuard';
 import { useAuth } from '@/features/auth/AuthProvider';
 import type { Channel } from '@/types/models';
 import {
@@ -13,13 +11,7 @@ import {
 } from '@/lib/firestore/channels';
 
 export default function ChannelsPage() {
-    return (
-        <AuthGuard>
-            <AuthenticatedLayout>
-                <ChannelsContent />
-            </AuthenticatedLayout>
-        </AuthGuard>
-    );
+    return <ChannelsContent />;
 }
 
 function ChannelsContent() {
