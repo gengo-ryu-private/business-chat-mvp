@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { MessagePostForm } from '@/components/messages/MessagePostForm';
 import { memberUser } from '@/test/factories';
+import { VALIDATION_LIMITS } from '@/utils/validation';
 
 describe('MessagePostForm', () => {
     it('shows a validation error for blank messages', async () => {
@@ -50,5 +51,31 @@ describe('MessagePostForm', () => {
             senderName: memberUser.displayName,
         });
         expect(screen.getByLabelText('メッセージ本文')).toHaveValue('');
+    });
+
+    it('shows a validation error when message body exceeds the max length', async () => {
+        const user = userEvent.setup();
+        const onCreateMessage = vi.fn();
+
+        render(
+            <MessagePostForm
+                appUser={memberUser}
+                channelId="channel-1"
+                onCreateMessage={onCreateMessage}
+            />,
+        );
+
+        await user.type(
+            screen.getByLabelText('メッセージ本文'),
+            'a'.repeat(VALIDATION_LIMITS.messageBodyMax + 1),
+        );
+        await user.click(screen.getByRole('button', { name: '投稿' }));
+
+        expect(
+            screen.getByText(
+                `メッセージ本文は${VALIDATION_LIMITS.messageBodyMax}文字以内で入力してください。`,
+            ),
+        ).toBeInTheDocument();
+        expect(onCreateMessage).not.toHaveBeenCalled();
     });
 });

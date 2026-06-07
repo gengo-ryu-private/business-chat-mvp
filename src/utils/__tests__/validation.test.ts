@@ -59,6 +59,15 @@ describe('validation utils', () => {
       ).toBe(true);
     });
 
+    it('前後空白は文字数に含めずに判定する', () => {
+      expect(
+        isWithinMaxLength(
+          ` ${'a'.repeat(VALIDATION_LIMITS.channelNameMax)} `,
+          VALIDATION_LIMITS.channelNameMax,
+        ),
+      ).toBe(true);
+    });
+
     it('前後空白を除いた文字数が上限を超える場合 false を返す', () => {
       expect(
         isWithinMaxLength(
@@ -94,6 +103,14 @@ describe('validation utils', () => {
 
     it('小文字を含む場合 false を返す', () => {
       expect(isValidJoinCode('abc234')).toBe(false);
+    });
+
+    it('6文字未満の場合 false を返す', () => {
+      expect(isValidJoinCode('ABC23')).toBe(false);
+    });
+
+    it('6文字を超える場合 false を返す', () => {
+      expect(isValidJoinCode('ABC2345')).toBe(false);
     });
   });
 });

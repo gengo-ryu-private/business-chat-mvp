@@ -23,6 +23,19 @@ describe('signup-data', () => {
             ).not.toThrow();
         });
 
+        it('ユーザー名とテナント名が上限ちょうどの場合は例外を投げない', () => {
+            expect(() =>
+                validateCreateTenantSignupInput({
+                    displayName: 'a'.repeat(
+                        VALIDATION_LIMITS.displayNameMax,
+                    ),
+                    email: 'yamada@example.com',
+                    password: 'password123',
+                    tenantName: 'b'.repeat(VALIDATION_LIMITS.tenantNameMax),
+                }),
+            ).not.toThrow();
+        });
+
         it('テナント名が空の場合はエラーを投げる', () => {
             expect(() =>
                 validateCreateTenantSignupInput({
@@ -113,7 +126,7 @@ describe('signup-data', () => {
                     displayName: '佐藤花子',
                     email: 'invalid-email',
                     password: 'password123',
-                    joinCode: 'ABC123',
+                    joinCode: 'ABC234',
                 }),
             ).toThrow(
                 new SignupApiError('メールアドレスの形式が正しくありません。'),
@@ -129,14 +142,14 @@ describe('signup-data', () => {
                 buildSignupTenantData({
                     tenantId: 'tenant-001',
                     tenantName: ' 開発チーム ',
-                    joinCode: 'ABC123',
+                    joinCode: 'ABC234',
                     createdBy: 'user-001',
                     timestamp,
                 }),
             ).toEqual({
                 id: 'tenant-001',
                 name: '開発チーム',
-                joinCode: 'ABC123',
+                joinCode: 'ABC234',
                 createdBy: 'user-001',
                 createdAt: timestamp,
                 updatedAt: timestamp,
