@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 
 import {
     Alert,
@@ -17,7 +17,13 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { isRequired, isValidEmail } from '@/utils/validation';
+import {
+    VALIDATION_LIMITS,
+    isRequired,
+    isValidEmail,
+    isValidJoinCode,
+    isWithinMaxLength,
+} from '@/utils/validation';
 
 type SignUpMode = 'newTenant' | 'joinTenant';
 
@@ -55,21 +61,37 @@ export function SignUpForm({
     const [errorMessage, setErrorMessage] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setErrorMessage('');
+        const trimmedDisplayName = displayName.trim();
+        const trimmedEmail = email.trim();
+        const trimmedTenantName = tenantName.trim();
+        const trimmedJoinCode = joinCode.trim();
 
-        if (!isRequired(displayName)) {
+        if (!isRequired(trimmedDisplayName)) {
             setErrorMessage('ユーザー名を入力してください。');
             return;
         }
 
-        if (!isRequired(email)) {
+        if (
+            !isWithinMaxLength(
+                trimmedDisplayName,
+                VALIDATION_LIMITS.displayNameMax,
+            )
+        ) {
+            setErrorMessage(
+                `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`,
+            );
+            return;
+        }
+
+        if (!isRequired(trimmedEmail)) {
             setErrorMessage('メールアドレスを入力してください。');
             return;
         }
 
-        if (!isValidEmail(email)) {
+        if (!isValidEmail(trimmedEmail)) {
             setErrorMessage('メールアドレスの形式が正しくありません。');
             return;
         }
@@ -79,14 +101,37 @@ export function SignUpForm({
             return;
         }
 
-        if (mode === 'newTenant' && !isRequired(tenantName)) {
-            setErrorMessage('テナント名を入力してください。');
-            return;
+        if (mode === 'newTenant') {
+            if (!isRequired(trimmedTenantName)) {
+                setErrorMessage('テナント名を入力してください。');
+                return;
+            }
+
+            if (
+                !isWithinMaxLength(
+                    trimmedTenantName,
+                    VALIDATION_LIMITS.tenantNameMax,
+                )
+            ) {
+                setErrorMessage(
+                    `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`,
+                );
+                return;
+            }
         }
 
-        if (mode === 'joinTenant' && !isRequired(joinCode)) {
-            setErrorMessage('参加コードを入力してください。');
-            return;
+        if (mode === 'joinTenant') {
+            if (!isRequired(trimmedJoinCode)) {
+                setErrorMessage('参加コードを入力してください。');
+                return;
+            }
+
+            if (!isValidJoinCode(trimmedJoinCode)) {
+                setErrorMessage(
+                    '参加コードは6文字の英数字大文字で入力してください。',
+                );
+                return;
+            }
         }
 
         try {
@@ -95,16 +140,16 @@ export function SignUpForm({
             const userId =
                 mode === 'newTenant'
                     ? await onCreateTenant({
-                          displayName,
-                          email,
+                          displayName: trimmedDisplayName,
+                          email: trimmedEmail,
                           password,
-                          tenantName,
+                          tenantName: trimmedTenantName,
                       })
                     : await onJoinTenant({
-                          displayName,
-                          email,
+                          displayName: trimmedDisplayName,
+                          email: trimmedEmail,
                           password,
-                          joinCode,
+                          joinCode: trimmedJoinCode,
                       });
 
             await onSuccess(userId);

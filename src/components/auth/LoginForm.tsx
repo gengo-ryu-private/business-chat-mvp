@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 
 import {
     Alert,
@@ -30,16 +30,17 @@ export function LoginForm({ onLogin, onSuccess }: LoginFormProps) {
     const [errorMessage, setErrorMessage] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setErrorMessage('');
+        const trimmedEmail = email.trim();
 
-        if (!isRequired(email)) {
+        if (!isRequired(trimmedEmail)) {
             setErrorMessage('メールアドレスを入力してください。');
             return;
         }
 
-        if (!isValidEmail(email)) {
+        if (!isValidEmail(trimmedEmail)) {
             setErrorMessage('メールアドレスの形式が正しくありません。');
             return;
         }
@@ -51,7 +52,7 @@ export function LoginForm({ onLogin, onSuccess }: LoginFormProps) {
 
         try {
             setSubmitting(true);
-            await onLogin(email, password);
+            await onLogin(trimmedEmail, password);
             onSuccess();
         } catch {
             setErrorMessage(

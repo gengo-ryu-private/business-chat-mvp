@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 
 import {
     Alert,
@@ -19,7 +19,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { AppUser, Channel, CreateChannelInput } from '@/types/models';
 import { canCreateChannel } from '@/utils/permissions';
-import { isRequired } from '@/utils/validation';
+import {
+    VALIDATION_LIMITS,
+    isRequired,
+    isWithinMaxLength,
+} from '@/utils/validation';
 
 type ChannelCreateFormProps = {
     appUser: AppUser;
@@ -39,22 +43,48 @@ export function ChannelCreateForm({
     const [creating, setCreating] = useState(false);
     const [createErrorMessage, setCreateErrorMessage] = useState('');
 
-    async function handleCreateChannel(event: FormEvent<HTMLFormElement>) {
+    async function handleCreateChannel(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setCreateErrorMessage('');
+        const trimmedChannelName = channelName.trim();
+        const trimmedChannelDescription = channelDescription.trim();
 
         if (!canCreateChannel(appUser)) {
             setCreateErrorMessage('チャンネルを作成する権限がありません。');
             return;
         }
 
-        if (!isRequired(channelName)) {
+        if (!isRequired(trimmedChannelName)) {
             setCreateErrorMessage('チャンネル名を入力してください。');
             return;
         }
 
+        if (
+            !isWithinMaxLength(
+                trimmedChannelName,
+                VALIDATION_LIMITS.channelNameMax,
+            )
+        ) {
+            setCreateErrorMessage(
+                `チャンネル名は${VALIDATION_LIMITS.channelNameMax}文字以内で入力してください。`,
+            );
+            return;
+        }
+
+        if (
+            !isWithinMaxLength(
+                trimmedChannelDescription,
+                VALIDATION_LIMITS.channelDescriptionMax,
+            )
+        ) {
+            setCreateErrorMessage(
+                `チャンネル説明は${VALIDATION_LIMITS.channelDescriptionMax}文字以内で入力してください。`,
+            );
+            return;
+        }
+
         const duplicatedChannel = channels.find(
-            (channel) => channel.name === channelName.trim(),
+            (channel) => channel.name === trimmedChannelName,
         );
 
         if (duplicatedChannel) {
@@ -67,8 +97,8 @@ export function ChannelCreateForm({
 
             await onCreateChannel({
                 tenantId: appUser.tenantId,
-                name: channelName.trim(),
-                description: channelDescription.trim() || undefined,
+                name: trimmedChannelName,
+                description: trimmedChannelDescription || undefined,
                 createdBy: appUser.id,
             });
 

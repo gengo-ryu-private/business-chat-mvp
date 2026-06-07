@@ -1,4 +1,10 @@
-import { isRequired, isValidEmail } from '@/utils/validation';
+import {
+    VALIDATION_LIMITS,
+    isRequired,
+    isValidEmail,
+    isValidJoinCode,
+    isWithinMaxLength,
+} from '@/utils/validation';
 
 export type CreateTenantSignupInput = {
     displayName: string;
@@ -48,6 +54,17 @@ export function validateCreateTenantSignupInput(
     if (!isNonEmptyString(input.tenantName)) {
         throw new SignupApiError('テナント名を入力してください。');
     }
+
+    if (
+        !isWithinMaxLength(
+            input.tenantName,
+            VALIDATION_LIMITS.tenantNameMax,
+        )
+    ) {
+        throw new SignupApiError(
+            `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`,
+        );
+    }
 }
 
 export function validateJoinTenantSignupInput(input: JoinTenantSignupInput) {
@@ -55,6 +72,12 @@ export function validateJoinTenantSignupInput(input: JoinTenantSignupInput) {
 
     if (!isNonEmptyString(input.joinCode)) {
         throw new SignupApiError('参加コードを入力してください。');
+    }
+
+    if (!isValidJoinCode(input.joinCode)) {
+        throw new SignupApiError(
+            '参加コードは6文字の英数字大文字で入力してください。',
+        );
     }
 }
 
@@ -84,6 +107,17 @@ function validateBaseInput(input: {
 }) {
     if (!isNonEmptyString(input.displayName)) {
         throw new SignupApiError('ユーザー名を入力してください。');
+    }
+
+    if (
+        !isWithinMaxLength(
+            input.displayName,
+            VALIDATION_LIMITS.displayNameMax,
+        )
+    ) {
+        throw new SignupApiError(
+            `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`,
+        );
     }
 
     if (!isNonEmptyString(input.email)) {

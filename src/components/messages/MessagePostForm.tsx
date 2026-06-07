@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 
 import {
     Alert,
@@ -17,7 +17,11 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { AppUser, CreateMessageInput } from '@/types/models';
-import { isBlankMessage } from '@/utils/validation';
+import {
+    VALIDATION_LIMITS,
+    isBlankMessage,
+    isWithinMaxLength,
+} from '@/utils/validation';
 
 type MessagePostFormProps = {
     appUser: AppUser | null;
@@ -34,17 +38,30 @@ export function MessagePostForm({
     const [posting, setPosting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setErrorMessage('');
+        const trimmedMessageBody = messageBody.trim();
 
         if (!appUser) {
             setErrorMessage('ログインユーザー情報を取得できません。');
             return;
         }
 
-        if (isBlankMessage(messageBody)) {
+        if (isBlankMessage(trimmedMessageBody)) {
             setErrorMessage('メッセージ本文を入力してください。');
+            return;
+        }
+
+        if (
+            !isWithinMaxLength(
+                trimmedMessageBody,
+                VALIDATION_LIMITS.messageBodyMax,
+            )
+        ) {
+            setErrorMessage(
+                `メッセージ本文は${VALIDATION_LIMITS.messageBodyMax}文字以内で入力してください。`,
+            );
             return;
         }
 
@@ -54,7 +71,7 @@ export function MessagePostForm({
             await onCreateMessage({
                 tenantId: appUser.tenantId,
                 channelId,
-                body: messageBody.trim(),
+                body: trimmedMessageBody,
                 senderId: appUser.id,
                 senderName: appUser.displayName,
             });

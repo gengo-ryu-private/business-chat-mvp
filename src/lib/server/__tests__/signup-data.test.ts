@@ -8,6 +8,7 @@ import {
     validateCreateTenantSignupInput,
     validateJoinTenantSignupInput,
 } from '@/lib/server/signup-data';
+import { VALIDATION_LIMITS } from '@/utils/validation';
 
 describe('signup-data', () => {
     describe('validateCreateTenantSignupInput', () => {
@@ -32,6 +33,40 @@ describe('signup-data', () => {
                 }),
             ).toThrow(new SignupApiError('テナント名を入力してください。'));
         });
+
+        it('ユーザー名が上限を超える場合はエラーを投げる', () => {
+            expect(() =>
+                validateCreateTenantSignupInput({
+                    displayName: 'a'.repeat(
+                        VALIDATION_LIMITS.displayNameMax + 1,
+                    ),
+                    email: 'yamada@example.com',
+                    password: 'password123',
+                    tenantName: '開発チーム',
+                }),
+            ).toThrow(
+                new SignupApiError(
+                    `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`,
+                ),
+            );
+        });
+
+        it('テナント名が上限を超える場合はエラーを投げる', () => {
+            expect(() =>
+                validateCreateTenantSignupInput({
+                    displayName: '山田太郎',
+                    email: 'yamada@example.com',
+                    password: 'password123',
+                    tenantName: 'a'.repeat(
+                        VALIDATION_LIMITS.tenantNameMax + 1,
+                    ),
+                }),
+            ).toThrow(
+                new SignupApiError(
+                    `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`,
+                ),
+            );
+        });
     });
 
     describe('validateJoinTenantSignupInput', () => {
@@ -41,7 +76,7 @@ describe('signup-data', () => {
                     displayName: '佐藤花子',
                     email: 'sato@example.com',
                     password: 'password123',
-                    joinCode: 'ABC123',
+                    joinCode: 'ABC234',
                 }),
             ).not.toThrow();
         });
@@ -55,6 +90,21 @@ describe('signup-data', () => {
                     joinCode: '',
                 }),
             ).toThrow(new SignupApiError('参加コードを入力してください。'));
+        });
+
+        it('参加コード形式が不正な場合はエラーを投げる', () => {
+            expect(() =>
+                validateJoinTenantSignupInput({
+                    displayName: '佐藤花子',
+                    email: 'sato@example.com',
+                    password: 'password123',
+                    joinCode: '0OI123',
+                }),
+            ).toThrow(
+                new SignupApiError(
+                    '参加コードは6文字の英数字大文字で入力してください。',
+                ),
+            );
         });
 
         it('メール形式が不正な場合はエラーを投げる', () => {
