@@ -55,15 +55,15 @@ users/{userId}
 
 ### フィールド
 
-| フィールド名 | 型        | 必須 | 説明                           |
-| ------------ | --------- | ---- | ------------------------------ |
-| id           | string    | 必須 | Firebase Authentication の UID |
-| displayName  | string    | 必須 | アプリ上で表示するユーザー名   |
-| email        | string    | 必須 | メールアドレス                 |
-| tenantId     | string    | 必須 | 所属テナントID                 |
-| role         | string    | 必須 | ユーザー種別                   |
-| createdAt    | timestamp | 必須 | 作成日時                       |
-| updatedAt    | timestamp | 必須 | 更新日時                       |
+| フィールド名 | 型        | 必須 | 説明                           | 制約                                     |
+| ------------ | --------- | ---- | ------------------------------ | ---------------------------------------- |
+| id           | string    | 必須 | Firebase Authentication の UID | Firebase Authentication の UID と一致する |
+| displayName  | string    | 必須 | アプリ上で表示するユーザー名   | 前後空白を除いた状態で1文字以上50文字以内 |
+| email        | string    | 必須 | メールアドレス                 | 前後空白を除いた状態でメール形式であること。Firebase Authentication 上で一意であること |
+| tenantId     | string    | 必須 | 所属テナントID                 | 所属する `tenants/{tenantId}` のIDと一致する |
+| role         | string    | 必須 | ユーザー種別                   | `admin` または `member` のいずれか       |
+| createdAt    | timestamp | 必須 | 作成日時                       | サーバー側で設定する                     |
+| updatedAt    | timestamp | 必須 | 更新日時                       | サーバー側で設定する                     |
 
 ### role の値
 
@@ -100,14 +100,14 @@ tenants/{tenantId}
 
 ### フィールド
 
-| フィールド名 | 型        | 必須 | 説明                     |
-| ------------ | --------- | ---- | ------------------------ |
-| id           | string    | 必須 | テナントID               |
-| name         | string    | 必須 | テナント名               |
-| joinCode     | string    | 必須 | 既存テナント参加用コード |
-| createdBy    | string    | 必須 | 作成者ユーザーID         |
-| createdAt    | timestamp | 必須 | 作成日時                 |
-| updatedAt    | timestamp | 必須 | 更新日時                 |
+| フィールド名 | 型        | 必須 | 説明                     | 制約                                      |
+| ------------ | --------- | ---- | ------------------------ | ----------------------------------------- |
+| id           | string    | 必須 | テナントID               | Firestore の `tenants/{tenantId}` のIDと一致する |
+| name         | string    | 必須 | テナント名               | 前後空白を除いた状態で1文字以上50文字以内 |
+| joinCode     | string    | 必須 | 既存テナント参加用コード | 6文字の英数字大文字。ただし誤読防止のため 0/O/I/1 は使用しない |
+| createdBy    | string    | 必須 | 作成者ユーザーID         | テナント作成者の Firebase Authentication UID |
+| createdAt    | timestamp | 必須 | 作成日時                 | サーバー側で設定する                      |
+| updatedAt    | timestamp | 必須 | 更新日時                 | サーバー側で設定する                      |
 
 ### データ例
 
@@ -136,15 +136,15 @@ tenants/{tenantId}/channels/{channelId}
 
 ### フィールド
 
-| フィールド名 | 型        | 必須 | 説明             |
-| ------------ | --------- | ---- | ---------------- |
-| id           | string    | 必須 | チャンネルID     |
-| tenantId     | string    | 必須 | 所属テナントID   |
-| name         | string    | 必須 | チャンネル名     |
-| description  | string    | 任意 | チャンネル説明   |
-| createdBy    | string    | 必須 | 作成者ユーザーID |
-| createdAt    | timestamp | 必須 | 作成日時         |
-| updatedAt    | timestamp | 必須 | 更新日時         |
+| フィールド名 | 型        | 必須 | 説明             | 制約                                      |
+| ------------ | --------- | ---- | ---------------- | ----------------------------------------- |
+| id           | string    | 必須 | チャンネルID     | Firestore の `channels/{channelId}` のIDと一致する |
+| tenantId     | string    | 必須 | 所属テナントID   | パス上の `tenants/{tenantId}` のIDと一致する |
+| name         | string    | 必須 | チャンネル名     | 前後空白を除いた状態で1文字以上50文字以内。同一テナント内で重複しないこと。MVPでは画面側で検証する |
+| description  | string    | 任意 | チャンネル説明   | 任意。前後空白を除いた状態で200文字以内   |
+| createdBy    | string    | 必須 | 作成者ユーザーID | チャンネル作成者の Firebase Authentication UID |
+| createdAt    | timestamp | 必須 | 作成日時         | Firestore Security Rules 上で `request.time` と一致する |
+| updatedAt    | timestamp | 必須 | 更新日時         | Firestore Security Rules 上で `request.time` と一致する |
 
 ### データ例
 
@@ -174,15 +174,15 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 
 ### フィールド
 
-| フィールド名 | 型        | 必須 | 説明             |
-| ------------ | --------- | ---- | ---------------- |
-| id           | string    | 必須 | メッセージID     |
-| tenantId     | string    | 必須 | 所属テナントID   |
-| channelId    | string    | 必須 | 所属チャンネルID |
-| body         | string    | 必須 | メッセージ本文   |
-| senderId     | string    | 必須 | 投稿者ユーザーID |
-| senderName   | string    | 必須 | 投稿者名         |
-| createdAt    | timestamp | 必須 | 投稿日時         |
+| フィールド名 | 型        | 必須 | 説明             | 制約                                      |
+| ------------ | --------- | ---- | ---------------- | ----------------------------------------- |
+| id           | string    | 必須 | メッセージID     | Firestore の `messages/{messageId}` のIDと一致する |
+| tenantId     | string    | 必須 | 所属テナントID   | パス上の `tenants/{tenantId}` のIDと一致する |
+| channelId    | string    | 必須 | 所属チャンネルID | パス上の `channels/{channelId}` のIDと一致する |
+| body         | string    | 必須 | メッセージ本文   | 前後空白を除いた状態で1文字以上1000文字以内 |
+| senderId     | string    | 必須 | 投稿者ユーザーID | 投稿者の Firebase Authentication UID と一致する |
+| senderName   | string    | 必須 | 投稿者名         | 投稿者の `users/{userId}.displayName` と一致する |
+| createdAt    | timestamp | 必須 | 投稿日時         | Firestore Security Rules 上で `request.time` と一致する |
 
 ### データ例
 
