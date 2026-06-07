@@ -36,8 +36,26 @@ service cloud.firestore {
       return value is string && value.size() > 0;
     }
 
-    function isOptionalString(value) {
-      return !request.resource.data.keys().hasAny(['description']) || value is string;
+    function isNonEmptyStringWithinMaxLength(value, maxLength) {
+      return isNonEmptyString(value) && value.size() <= maxLength;
+    }
+
+    function isOptionalDescriptionWithinMaxLength(maxLength) {
+      return !request.resource.data.keys().hasAny(['description'])
+        || (request.resource.data.description is string
+          && request.resource.data.description.size() <= maxLength);
+    }
+
+    function isValidChannelName(value) {
+      return isNonEmptyStringWithinMaxLength(value, 50);
+    }
+
+    function isValidChannelDescription() {
+      return isOptionalDescriptionWithinMaxLength(200);
+    }
+
+    function isValidMessageBody(value) {
+      return isNonEmptyStringWithinMaxLength(value, 1000);
     }
 
     match /users/{userId} {
@@ -65,8 +83,8 @@ service cloud.firestore {
           && request.resource.data.id == channelId
           && request.resource.data.tenantId == tenantId
           && request.resource.data.createdBy == request.auth.uid
-          && isNonEmptyString(request.resource.data.name)
-          && isOptionalString(request.resource.data.description)
+          && isValidChannelName(request.resource.data.name)
+          && isValidChannelDescription()
           && request.resource.data.createdAt == request.time
           && request.resource.data.updatedAt == request.time;
 
@@ -84,7 +102,7 @@ service cloud.firestore {
             && request.resource.data.channelId == channelId
             && request.resource.data.senderId == request.auth.uid
             && request.resource.data.senderName == signedInUserName()
-            && isNonEmptyString(request.resource.data.body)
+            && isValidMessageBody(request.resource.data.body)
             && request.resource.data.createdAt == request.time;
 
           allow update, delete: if false;
