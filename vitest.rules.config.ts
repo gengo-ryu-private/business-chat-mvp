@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: 'node',
+    fileParallelism: false,
     globals: true,
     include: ['src/**/*.rules.test.ts'],
   },

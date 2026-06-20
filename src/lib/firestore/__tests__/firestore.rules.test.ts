@@ -78,7 +78,7 @@ afterAll(async () => {
 });
 
 describe('firestore.rules validation constraints', () => {
-  it('allows a channel name at the max length', async () => {
+  it('チャンネル名が最大文字数ちょうどなら作成できる', async () => {
     const db = testEnv.authenticatedContext(adminUserId).firestore();
 
     await assertSucceeds(
@@ -93,7 +93,7 @@ describe('firestore.rules validation constraints', () => {
     );
   });
 
-  it('rejects a channel name over the max length', async () => {
+  it('チャンネル名が最大文字数を超えると作成できない', async () => {
     const db = testEnv.authenticatedContext(adminUserId).firestore();
 
     await assertFails(
@@ -108,7 +108,7 @@ describe('firestore.rules validation constraints', () => {
     );
   });
 
-  it('allows a channel description at the max length', async () => {
+  it('チャンネル説明が最大文字数ちょうどなら作成できる', async () => {
     const db = testEnv.authenticatedContext(adminUserId).firestore();
 
     await assertSucceeds(
@@ -124,7 +124,7 @@ describe('firestore.rules validation constraints', () => {
     );
   });
 
-  it('rejects a channel description over the max length', async () => {
+  it('チャンネル説明が最大文字数を超えると作成できない', async () => {
     const db = testEnv.authenticatedContext(adminUserId).firestore();
 
     await assertFails(
@@ -140,7 +140,7 @@ describe('firestore.rules validation constraints', () => {
     );
   });
 
-  it('allows a message body at the max length', async () => {
+  it('メッセージ本文が最大文字数ちょうどなら投稿できる', async () => {
     const db = testEnv.authenticatedContext(memberUserId).firestore();
 
     await assertSucceeds(
@@ -160,7 +160,7 @@ describe('firestore.rules validation constraints', () => {
     );
   });
 
-  it('rejects a message body over the max length', async () => {
+  it('メッセージ本文が最大文字数を超えると投稿できない', async () => {
     const db = testEnv.authenticatedContext(memberUserId).firestore();
 
     await assertFails(
