@@ -54,8 +54,8 @@ describe('validation utils', () => {
       expect(
         isWithinMaxLength(
           'a'.repeat(VALIDATION_LIMITS.channelNameMax),
-          VALIDATION_LIMITS.channelNameMax,
-        ),
+          VALIDATION_LIMITS.channelNameMax
+        )
       ).toBe(true);
     });
 
@@ -63,8 +63,8 @@ describe('validation utils', () => {
       expect(
         isWithinMaxLength(
           ` ${'a'.repeat(VALIDATION_LIMITS.channelNameMax)} `,
-          VALIDATION_LIMITS.channelNameMax,
-        ),
+          VALIDATION_LIMITS.channelNameMax
+        )
       ).toBe(true);
     });
 
@@ -72,8 +72,8 @@ describe('validation utils', () => {
       expect(
         isWithinMaxLength(
           'a'.repeat(VALIDATION_LIMITS.channelNameMax + 1),
-          VALIDATION_LIMITS.channelNameMax,
-        ),
+          VALIDATION_LIMITS.channelNameMax
+        )
       ).toBe(false);
     });
   });
@@ -81,13 +81,13 @@ describe('validation utils', () => {
   describe('hasExactLength', () => {
     it('前後空白を除いた文字数が指定文字数と一致する場合 true を返す', () => {
       expect(hasExactLength(' ABC123 ', VALIDATION_LIMITS.joinCodeLength)).toBe(
-        true,
+        true
       );
     });
 
     it('前後空白を除いた文字数が指定文字数と一致しない場合 false を返す', () => {
       expect(hasExactLength('ABC12', VALIDATION_LIMITS.joinCodeLength)).toBe(
-        false,
+        false
       );
     });
   });

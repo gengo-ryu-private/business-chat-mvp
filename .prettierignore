@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+
+# Next.js
+.next
+out
+
+# production
+build
+
+# reports and coverage
+coverage
+playwright-report
+test-results
+
+# logs
+*.log
+
+# environment
+.env*
+!.env.example
+!.env.local.example
+
+# generated
+next-env.d.ts
+*.tsbuildinfo

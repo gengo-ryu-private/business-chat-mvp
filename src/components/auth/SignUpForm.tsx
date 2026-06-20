@@ -3,301 +3,272 @@
 import Link from 'next/link';
 import { SubmitEvent, useState } from 'react';
 
-import {
-    Alert,
-    AlertDescription,
-} from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    VALIDATION_LIMITS,
-    isRequired,
-    isValidEmail,
-    isValidJoinCode,
-    isWithinMaxLength,
+  VALIDATION_LIMITS,
+  isRequired,
+  isValidEmail,
+  isValidJoinCode,
+  isWithinMaxLength,
 } from '@/utils/validation';
 
 type SignUpMode = 'newTenant' | 'joinTenant';
 
 type SignUpBaseInput = {
-    displayName: string;
-    email: string;
-    password: string;
+  displayName: string;
+  email: string;
+  password: string;
 };
 
 type SignUpWithNewTenantInput = SignUpBaseInput & {
-    tenantName: string;
+  tenantName: string;
 };
 
 type SignUpWithJoinCodeInput = SignUpBaseInput & {
-    joinCode: string;
+  joinCode: string;
 };
 
 type SignUpFormProps = {
-    onCreateTenant: (input: SignUpWithNewTenantInput) => Promise<string>;
-    onJoinTenant: (input: SignUpWithJoinCodeInput) => Promise<string>;
-    onSuccess: (userId: string) => Promise<void> | void;
+  onCreateTenant: (input: SignUpWithNewTenantInput) => Promise<string>;
+  onJoinTenant: (input: SignUpWithJoinCodeInput) => Promise<string>;
+  onSuccess: (userId: string) => Promise<void> | void;
 };
 
 export function SignUpForm({
-    onCreateTenant,
-    onJoinTenant,
-    onSuccess,
+  onCreateTenant,
+  onJoinTenant,
+  onSuccess,
 }: SignUpFormProps) {
-    const [mode, setMode] = useState<SignUpMode>('newTenant');
-    const [displayName, setDisplayName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [tenantName, setTenantName] = useState('');
-    const [joinCode, setJoinCode] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [submitting, setSubmitting] = useState(false);
+  const [mode, setMode] = useState<SignUpMode>('newTenant');
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [tenantName, setTenantName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setErrorMessage('');
-        const trimmedDisplayName = displayName.trim();
-        const trimmedEmail = email.trim();
-        const trimmedTenantName = tenantName.trim();
-        const trimmedJoinCode = joinCode.trim();
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage('');
+    const trimmedDisplayName = displayName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedTenantName = tenantName.trim();
+    const trimmedJoinCode = joinCode.trim();
 
-        if (!isRequired(trimmedDisplayName)) {
-            setErrorMessage('ユーザー名を入力してください。');
-            return;
-        }
-
-        if (
-            !isWithinMaxLength(
-                trimmedDisplayName,
-                VALIDATION_LIMITS.displayNameMax,
-            )
-        ) {
-            setErrorMessage(
-                `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`,
-            );
-            return;
-        }
-
-        if (!isRequired(trimmedEmail)) {
-            setErrorMessage('メールアドレスを入力してください。');
-            return;
-        }
-
-        if (!isValidEmail(trimmedEmail)) {
-            setErrorMessage('メールアドレスの形式が正しくありません。');
-            return;
-        }
-
-        if (!isRequired(password)) {
-            setErrorMessage('パスワードを入力してください。');
-            return;
-        }
-
-        if (mode === 'newTenant') {
-            if (!isRequired(trimmedTenantName)) {
-                setErrorMessage('テナント名を入力してください。');
-                return;
-            }
-
-            if (
-                !isWithinMaxLength(
-                    trimmedTenantName,
-                    VALIDATION_LIMITS.tenantNameMax,
-                )
-            ) {
-                setErrorMessage(
-                    `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`,
-                );
-                return;
-            }
-        }
-
-        if (mode === 'joinTenant') {
-            if (!isRequired(trimmedJoinCode)) {
-                setErrorMessage('参加コードを入力してください。');
-                return;
-            }
-
-            if (!isValidJoinCode(trimmedJoinCode)) {
-                setErrorMessage(
-                    '参加コードは6文字の英数字大文字で入力してください。',
-                );
-                return;
-            }
-        }
-
-        try {
-            setSubmitting(true);
-
-            const userId =
-                mode === 'newTenant'
-                    ? await onCreateTenant({
-                          displayName: trimmedDisplayName,
-                          email: trimmedEmail,
-                          password,
-                          tenantName: trimmedTenantName,
-                      })
-                    : await onJoinTenant({
-                          displayName: trimmedDisplayName,
-                          email: trimmedEmail,
-                          password,
-                          joinCode: trimmedJoinCode,
-                      });
-
-            await onSuccess(userId);
-        } catch (error) {
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : 'ユーザー登録に失敗しました。入力内容を確認してください。';
-
-            setErrorMessage(message);
-        } finally {
-            setSubmitting(false);
-        }
+    if (!isRequired(trimmedDisplayName)) {
+      setErrorMessage('ユーザー名を入力してください。');
+      return;
     }
 
-    return (
-        <main className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
-            <Card className="w-full max-w-xl">
-                <CardHeader>
-                    <CardTitle>新規登録</CardTitle>
-                    <CardDescription>
-                        新しいテナントを作成するか、参加コードで既存テナントに参加します。
-                    </CardDescription>
-                </CardHeader>
+    if (
+      !isWithinMaxLength(trimmedDisplayName, VALIDATION_LIMITS.displayNameMax)
+    ) {
+      setErrorMessage(
+        `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`
+      );
+      return;
+    }
 
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <fieldset className="space-y-3 rounded-lg border p-4">
-                            <legend className="px-1 text-sm font-medium">
-                                登録方法
-                            </legend>
+    if (!isRequired(trimmedEmail)) {
+      setErrorMessage('メールアドレスを入力してください。');
+      return;
+    }
 
-                            <label className="flex items-center gap-2 text-sm">
-                                <input
-                                    type="radio"
-                                    name="signupMode"
-                                    value="newTenant"
-                                    checked={mode === 'newTenant'}
-                                    onChange={() => setMode('newTenant')}
-                                />
-                                新しいテナントを作成する
-                            </label>
+    if (!isValidEmail(trimmedEmail)) {
+      setErrorMessage('メールアドレスの形式が正しくありません。');
+      return;
+    }
 
-                            <label className="flex items-center gap-2 text-sm">
-                                <input
-                                    type="radio"
-                                    name="signupMode"
-                                    value="joinTenant"
-                                    checked={mode === 'joinTenant'}
-                                    onChange={() => setMode('joinTenant')}
-                                />
-                                既存テナントに参加する
-                            </label>
-                        </fieldset>
+    if (!isRequired(password)) {
+      setErrorMessage('パスワードを入力してください。');
+      return;
+    }
 
-                        <div className="space-y-2">
-                            <Label htmlFor="displayName">ユーザー名</Label>
-                            <Input
-                                id="displayName"
-                                type="text"
-                                value={displayName}
-                                onChange={(event) =>
-                                    setDisplayName(event.target.value)
-                                }
-                                autoComplete="name"
-                            />
-                        </div>
+    if (mode === 'newTenant') {
+      if (!isRequired(trimmedTenantName)) {
+        setErrorMessage('テナント名を入力してください。');
+        return;
+      }
 
-                        <div className="space-y-2">
-                            <Label htmlFor="email">メールアドレス</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(event) =>
-                                    setEmail(event.target.value)
-                                }
-                                autoComplete="email"
-                            />
-                        </div>
+      if (
+        !isWithinMaxLength(trimmedTenantName, VALIDATION_LIMITS.tenantNameMax)
+      ) {
+        setErrorMessage(
+          `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`
+        );
+        return;
+      }
+    }
 
-                        <div className="space-y-2">
-                            <Label htmlFor="password">パスワード</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(event) =>
-                                    setPassword(event.target.value)
-                                }
-                                autoComplete="new-password"
-                            />
-                        </div>
+    if (mode === 'joinTenant') {
+      if (!isRequired(trimmedJoinCode)) {
+        setErrorMessage('参加コードを入力してください。');
+        return;
+      }
 
-                        {mode === 'newTenant' ? (
-                            <div className="space-y-2">
-                                <Label htmlFor="tenantName">テナント名</Label>
-                                <Input
-                                    id="tenantName"
-                                    type="text"
-                                    value={tenantName}
-                                    onChange={(event) =>
-                                        setTenantName(event.target.value)
-                                    }
-                                />
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                <Label htmlFor="joinCode">参加コード</Label>
-                                <Input
-                                    id="joinCode"
-                                    type="text"
-                                    value={joinCode}
-                                    onChange={(event) =>
-                                        setJoinCode(event.target.value)
-                                    }
-                                />
-                            </div>
-                        )}
+      if (!isValidJoinCode(trimmedJoinCode)) {
+        setErrorMessage('参加コードは6文字の英数字大文字で入力してください。');
+        return;
+      }
+    }
 
-                        {errorMessage && (
-                            <Alert variant="destructive">
-                                <AlertDescription>
-                                    {errorMessage}
-                                </AlertDescription>
-                            </Alert>
-                        )}
+    try {
+      setSubmitting(true);
 
-                        <Button
-                            type="submit"
-                            disabled={submitting}
-                            className="w-full"
-                        >
-                            {submitting ? '登録中...' : '登録'}
-                        </Button>
-                    </form>
+      const userId =
+        mode === 'newTenant'
+          ? await onCreateTenant({
+              displayName: trimmedDisplayName,
+              email: trimmedEmail,
+              password,
+              tenantName: trimmedTenantName,
+            })
+          : await onJoinTenant({
+              displayName: trimmedDisplayName,
+              email: trimmedEmail,
+              password,
+              joinCode: trimmedJoinCode,
+            });
 
-                    <p className="mt-6 text-center text-sm text-muted-foreground">
-                        アカウントをお持ちの方は{' '}
-                        <Link
-                            href="/login"
-                            className="font-medium text-foreground underline-offset-4 hover:underline"
-                        >
-                            ログイン
-                        </Link>
-                    </p>
-                </CardContent>
-            </Card>
-        </main>
-    );
+      await onSuccess(userId);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'ユーザー登録に失敗しました。入力内容を確認してください。';
+
+      setErrorMessage(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
+      <Card className="w-full max-w-xl">
+        <CardHeader>
+          <CardTitle>新規登録</CardTitle>
+          <CardDescription>
+            新しいテナントを作成するか、参加コードで既存テナントに参加します。
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <fieldset className="space-y-3 rounded-lg border p-4">
+              <legend className="px-1 text-sm font-medium">登録方法</legend>
+
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signupMode"
+                  value="newTenant"
+                  checked={mode === 'newTenant'}
+                  onChange={() => setMode('newTenant')}
+                />
+                新しいテナントを作成する
+              </label>
+
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signupMode"
+                  value="joinTenant"
+                  checked={mode === 'joinTenant'}
+                  onChange={() => setMode('joinTenant')}
+                />
+                既存テナントに参加する
+              </label>
+            </fieldset>
+
+            <div className="space-y-2">
+              <Label htmlFor="displayName">ユーザー名</Label>
+              <Input
+                id="displayName"
+                type="text"
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                autoComplete="name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">メールアドレス</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">パスワード</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+
+            {mode === 'newTenant' ? (
+              <div className="space-y-2">
+                <Label htmlFor="tenantName">テナント名</Label>
+                <Input
+                  id="tenantName"
+                  type="text"
+                  value={tenantName}
+                  onChange={(event) => setTenantName(event.target.value)}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="joinCode">参加コード</Label>
+                <Input
+                  id="joinCode"
+                  type="text"
+                  value={joinCode}
+                  onChange={(event) => setJoinCode(event.target.value)}
+                />
+              </div>
+            )}
+
+            {errorMessage && (
+              <Alert variant="destructive">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button type="submit" disabled={submitting} className="w-full">
+              {submitting ? '登録中...' : '登録'}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            アカウントをお持ちの方は{' '}
+            <Link
+              href="/login"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              ログイン
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </main>
+  );
 }

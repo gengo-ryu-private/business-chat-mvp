@@ -311,11 +311,11 @@ Firebase Authentication と Firestore を Emulator 上で動かし、テスト�
 
 ```json
 {
-    "id": "test-admin-user",
-    "displayName": "管理者ユーザー",
-    "email": "admin@example.com",
-    "tenantId": "test-tenant",
-    "role": "admin"
+  "id": "test-admin-user",
+  "displayName": "管理者ユーザー",
+  "email": "admin@example.com",
+  "tenantId": "test-tenant",
+  "role": "admin"
 }
 ```
 
@@ -323,11 +323,11 @@ Firebase Authentication と Firestore を Emulator 上で動かし、テスト�
 
 ```json
 {
-    "id": "test-member-user",
-    "displayName": "一般ユーザー",
-    "email": "member@example.com",
-    "tenantId": "test-tenant",
-    "role": "member"
+  "id": "test-member-user",
+  "displayName": "一般ユーザー",
+  "email": "member@example.com",
+  "tenantId": "test-tenant",
+  "role": "member"
 }
 ```
 
@@ -335,10 +335,10 @@ Firebase Authentication と Firestore を Emulator 上で動かし、テスト�
 
 ```json
 {
-    "id": "test-tenant",
-    "name": "テストテナント",
-    "joinCode": "TEST123",
-    "createdBy": "test-admin-user"
+  "id": "test-tenant",
+  "name": "テストテナント",
+  "joinCode": "TEST123",
+  "createdBy": "test-admin-user"
 }
 ```
 
@@ -346,11 +346,11 @@ Firebase Authentication と Firestore を Emulator 上で動かし、テスト�
 
 ```json
 {
-    "id": "test-channel",
-    "tenantId": "test-tenant",
-    "name": "general",
-    "description": "テスト用チャンネル",
-    "createdBy": "test-admin-user"
+  "id": "test-channel",
+  "tenantId": "test-tenant",
+  "name": "general",
+  "description": "テスト用チャンネル",
+  "createdBy": "test-admin-user"
 }
 ```
 
@@ -358,12 +358,12 @@ Firebase Authentication と Firestore を Emulator 上で動かし、テスト�
 
 ```json
 {
-    "id": "test-message",
-    "tenantId": "test-tenant",
-    "channelId": "test-channel",
-    "body": "テストメッセージです。",
-    "senderId": "test-member-user",
-    "senderName": "一般ユーザー"
+  "id": "test-message",
+  "tenantId": "test-tenant",
+  "channelId": "test-channel",
+  "body": "テストメッセージです。",
+  "senderId": "test-member-user",
+  "senderName": "一般ユーザー"
 }
 ```
 

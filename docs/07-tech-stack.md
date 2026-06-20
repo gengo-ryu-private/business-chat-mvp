@@ -110,35 +110,35 @@ MVPでは、以下の目的で使用する。
 type UserRole = 'admin' | 'member';
 
 type AppUser = {
-    id: string;
-    displayName: string;
-    email: string;
-    tenantId: string;
-    role: UserRole;
+  id: string;
+  displayName: string;
+  email: string;
+  tenantId: string;
+  role: UserRole;
 };
 
 type Tenant = {
-    id: string;
-    name: string;
-    joinCode: string;
-    createdBy: string;
+  id: string;
+  name: string;
+  joinCode: string;
+  createdBy: string;
 };
 
 type Channel = {
-    id: string;
-    tenantId: string;
-    name: string;
-    description?: string;
-    createdBy: string;
+  id: string;
+  tenantId: string;
+  name: string;
+  description?: string;
+  createdBy: string;
 };
 
 type Message = {
-    id: string;
-    tenantId: string;
-    channelId: string;
-    body: string;
-    senderId: string;
-    senderName: string;
+  id: string;
+  tenantId: string;
+  channelId: string;
+  body: string;
+  senderId: string;
+  senderName: string;
 };
 ```
 

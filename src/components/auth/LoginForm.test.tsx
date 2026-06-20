@@ -5,20 +5,15 @@ import { describe, expect, it, vi } from 'vitest';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 describe('LoginForm', () => {
-    it('shows a validation error when email is empty', async () => {
-        const user = userEvent.setup();
+  it('shows a validation error when email is empty', async () => {
+    const user = userEvent.setup();
 
-        render(
-            <LoginForm
-                onLogin={vi.fn()}
-                onSuccess={vi.fn()}
-            />,
-        );
+    render(<LoginForm onLogin={vi.fn()} onSuccess={vi.fn()} />);
 
-        await user.click(screen.getByRole('button', { name: 'ログイン' }));
+    await user.click(screen.getByRole('button', { name: 'ログイン' }));
 
-        expect(
-            screen.getByText('メールアドレスを入力してください。'),
-        ).toBeInTheDocument();
-    });
+    expect(
+      screen.getByText('メールアドレスを入力してください。')
+    ).toBeInTheDocument();
+  });
 });

@@ -5,56 +5,53 @@ import { useCallback, useEffect, useState } from 'react';
 import { ChannelsPanel } from '@/components/channels/ChannelsPanel';
 import { useAuth } from '@/features/auth/AuthProvider';
 import type { Channel } from '@/types/models';
-import {
-    createChannelWithAutoId,
-    getChannels,
-} from '@/lib/firestore/channels';
+import { createChannelWithAutoId, getChannels } from '@/lib/firestore/channels';
 
 export default function ChannelsPage() {
-    return <ChannelsContent />;
+  return <ChannelsContent />;
 }
 
 function ChannelsContent() {
-    const { appUser } = useAuth();
+  const { appUser } = useAuth();
 
-    const [channels, setChannels] = useState<Channel[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
-    const fetchChannels = useCallback(async () => {
-        await Promise.resolve();
+  const fetchChannels = useCallback(async () => {
+    await Promise.resolve();
 
-        if (!appUser) {
-            setChannels([]);
-            setLoading(false);
-            return;
-        }
+    if (!appUser) {
+      setChannels([]);
+      setLoading(false);
+      return;
+    }
 
-        try {
-            setLoading(true);
-            setErrorMessage('');
+    try {
+      setLoading(true);
+      setErrorMessage('');
 
-            const fetchedChannels = await getChannels(appUser.tenantId);
-            setChannels(fetchedChannels);
-        } catch {
-            setErrorMessage('チャンネル一覧の取得に失敗しました。');
-        } finally {
-            setLoading(false);
-        }
-    }, [appUser]);
+      const fetchedChannels = await getChannels(appUser.tenantId);
+      setChannels(fetchedChannels);
+    } catch {
+      setErrorMessage('チャンネル一覧の取得に失敗しました。');
+    } finally {
+      setLoading(false);
+    }
+  }, [appUser]);
 
-    useEffect(() => {
-        void Promise.resolve().then(fetchChannels);
-    }, [fetchChannels]);
+  useEffect(() => {
+    void Promise.resolve().then(fetchChannels);
+  }, [fetchChannels]);
 
-    return (
-        <ChannelsPanel
-            appUser={appUser}
-            channels={channels}
-            loading={loading}
-            errorMessage={errorMessage}
-            onCreateChannel={createChannelWithAutoId}
-            onChannelsChanged={fetchChannels}
-        />
-    );
+  return (
+    <ChannelsPanel
+      appUser={appUser}
+      channels={channels}
+      loading={loading}
+      errorMessage={errorMessage}
+      onCreateChannel={createChannelWithAutoId}
+      onChannelsChanged={fetchChannels}
+    />
+  );
 }

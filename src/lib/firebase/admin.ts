@@ -9,37 +9,37 @@ const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 const authEmulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST;
 const firestoreEmulatorHost = process.env.FIRESTORE_EMULATOR_HOST;
 const hasPartialEmulatorConfig =
-    Boolean(authEmulatorHost) !== Boolean(firestoreEmulatorHost);
+  Boolean(authEmulatorHost) !== Boolean(firestoreEmulatorHost);
 const usesFirebaseEmulator = Boolean(authEmulatorHost && firestoreEmulatorHost);
 
 if (!projectId) {
-    throw new Error('Missing Firebase project ID.');
+  throw new Error('Missing Firebase project ID.');
 }
 
 if (hasPartialEmulatorConfig) {
-    throw new Error(
-        'Both FIREBASE_AUTH_EMULATOR_HOST and FIRESTORE_EMULATOR_HOST are required for Firebase Emulator.',
-    );
+  throw new Error(
+    'Both FIREBASE_AUTH_EMULATOR_HOST and FIRESTORE_EMULATOR_HOST are required for Firebase Emulator.'
+  );
 }
 
 if (!usesFirebaseEmulator && (!clientEmail || !privateKey)) {
-    throw new Error('Missing Firebase Admin environment variables.');
+  throw new Error('Missing Firebase Admin environment variables.');
 }
 
 const app =
-    getApps().length > 0
-        ? getApps()[0]
-        : initializeApp(
-              usesFirebaseEmulator
-                  ? { projectId }
-                  : {
-                        credential: cert({
-                            projectId,
-                            clientEmail,
-                            privateKey,
-                        }),
-                    },
-          );
+  getApps().length > 0
+    ? getApps()[0]
+    : initializeApp(
+        usesFirebaseEmulator
+          ? { projectId }
+          : {
+              credential: cert({
+                projectId,
+                clientEmail,
+                privateKey,
+              }),
+            }
+      );
 
 export const adminAuth = getAuth(app);
 export const adminDb = getFirestore(app);
