@@ -224,118 +224,24 @@ Message
 | messages.channelId | channels.id | メッセージが投稿されたチャンネル |
 | messages.senderId  | users.id    | メッセージ投稿者                 |
 
-## ユーザー登録時のデータ作成
+## 権限制御に関係するデータ設計
 
-Phase 3 の要件・設計再確認により、登録時のデータ作成は Next.js Route Handler と Firebase Admin SDK で行う方針とする。
+このMVPでは、Firestore 上の `tenantId` と `role` を権限制御の中心に置く。
 
-理由は、参加コード検索、`role` の決定、`tenantId` の紐付けをクライアント側の自己申告に依存させないためである。
+| データ                         | 権限制御上の役割                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------------- |
+| `users/{userId}.tenantId`      | ログインユーザーが参照・操作できるテナント範囲を決める                           |
+| `users/{userId}.role`          | チャンネル作成など、管理者だけに許可する操作を判定する                           |
+| `tenants/{tenantId}.joinCode`  | 既存テナント参加時に、参加先テナントを特定するために使用する                     |
+| `channels/{channelId}.tenantId` | パス上の `tenantId` と一致させ、他テナントへの不正な紐付けを防ぐ                 |
+| `messages/{messageId}.tenantId` | パス上の `tenantId` と一致させ、他テナントへの不正な紐付けを防ぐ                 |
+| `messages/{messageId}.channelId` | パス上の `channelId` と一致させ、別チャンネルへの不正な紐付けを防ぐ            |
+| `messages/{messageId}.senderId` | 投稿者を Firebase Authentication の UID と一致させ、なりすましを防ぐ            |
 
-通常のチャンネル取得、チャンネル作成、メッセージ投稿などは Firebase Client SDK と Firestore Security Rules で制御する。
-一方で、ユーザー登録時の以下の処理は権限の根拠を作る処理であるため、サーバー側に集約する。
+`users/{userId}` と `tenants/{tenantId}` は、ユーザー登録・テナント参加時に Next.js Route Handler と Firebase Admin SDK で作成する。
+これは、`role` の決定、`tenantId` の紐付け、`joinCode` によるテナント検索をブラウザ側の自己申告に依存させないためである。
 
-- Firebase Authentication ユーザーの作成
-- 新規テナント作成
-- 参加コードによるテナント検索
-- `users/{userId}` の作成
-- `admin` / `member` の決定
-- ユーザーとテナントの紐付け
-
-### 新規テナントを作成する場合
-
-新規テナントを作成してユーザー登録する場合、以下のデータを作成する。
-
-1. ブラウザから Next.js Route Handler にユーザー名、メールアドレス、パスワード、テナント名を送信する
-2. Route Handler で入力値を検証する
-3. Firebase Admin SDK で Firebase Authentication にユーザーを作成する
-4. Route Handler で `tenants/{tenantId}` を作成する
-5. Route Handler で `users/{userId}` を作成する
-
-この場合、ユーザーの `role` は Route Handler 側で `admin` に固定する。
-`tenantId`、`joinCode`、`createdBy` もクライアントから受け取らず、Route Handler 側で決定する。
-
-### 作成する users の例
-
-```json
-{
-  "id": "firebase-auth-uid-001",
-  "displayName": "山田太郎",
-  "email": "yamada@example.com",
-  "tenantId": "tenant-001",
-  "role": "admin",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
-}
-```
-
-### 作成する tenants の例
-
-```json
-{
-  "id": "tenant-001",
-  "name": "サンプル開発チーム",
-  "joinCode": "ABC123",
-  "createdBy": "firebase-auth-uid-001",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
-}
-```
-
-## 既存テナント参加時のデータ作成
-
-参加コードを使って既存テナントに参加する場合、以下のデータを作成する。
-
-1. ブラウザから Next.js Route Handler にユーザー名、メールアドレス、パスワード、参加コードを送信する
-2. Route Handler で入力値を検証する
-3. Route Handler が Firebase Admin SDK で参加コードに一致するテナントを検索する
-4. Firebase Admin SDK で Firebase Authentication にユーザーを作成する
-5. Route Handler で `users/{userId}` を作成する
-
-この場合、ユーザーの `role` は Route Handler 側で `member` に固定する。
-`tenantId` は参加コード検索で見つかったテナントから決定し、クライアントからは受け取らない。
-
-### 作成する users の例
-
-```json
-{
-  "id": "firebase-auth-uid-002",
-  "displayName": "佐藤花子",
-  "email": "sato@example.com",
-  "tenantId": "tenant-001",
-  "role": "member",
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
-}
-```
-
-## チャンネル作成時のデータ作成
-
-管理者ユーザーがチャンネルを作成する場合、以下のデータを作成する。
-
-```text
-tenants/{tenantId}/channels/{channelId}
-```
-
-チャンネル作成時には、以下を確認する。
-
-- ログイン済みユーザーであること
-- ユーザーが対象テナントに所属していること
-- ユーザーの `role` が `admin` であること
-- 同一テナント内に同じチャンネル名が存在しないこと
-
-## メッセージ投稿時のデータ作成
-
-ユーザーがメッセージを投稿する場合、以下のデータを作成する。
-
-```text
-tenants/{tenantId}/channels/{channelId}/messages/{messageId}
-```
-
-メッセージ投稿時には、以下を確認する。
-
-- ログイン済みユーザーであること
-- ユーザーが対象テナントに所属していること
-- 対象チャンネルが所属テナント内に存在すること
-- メッセージ本文が空ではないこと
+登録・参加、チャンネル作成、メッセージ投稿の処理フローは `docs/10-data-flow.md` に整理する。
 
 ## クエリ設計
 

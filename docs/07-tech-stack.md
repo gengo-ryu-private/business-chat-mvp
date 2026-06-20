@@ -201,6 +201,7 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 ```
 
 データ構造の詳細は `docs/05-data-model.md` に整理する。
+登録・参加、チャンネル作成、メッセージ投稿の処理フローは `docs/10-data-flow.md` に整理する。
 
 ## Firestore Security Rules
 

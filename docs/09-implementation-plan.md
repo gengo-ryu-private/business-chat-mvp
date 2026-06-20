@@ -4,7 +4,7 @@
 
 このドキュメントでは、業務用チャットアプリMVPを実装する順序を整理する。
 
-`docs/01-purpose.md` から `docs/08-test-policy.md` までで整理した目的、ユーザー課題、スコープ、機能要件、データ設計、画面設計、技術構成、テスト方針をもとに、実装をどの順番で進めるかを明確にする。
+`docs/01-purpose.md` から `docs/08-test-policy.md` までで整理した目的、ユーザー課題、スコープ、機能要件、データ設計、画面設計、技術構成、テスト方針と、`docs/10-data-flow.md` で整理したデータ処理フローをもとに、実装をどの順番で進めるかを明確にする。
 
 新しい作業チャットで実装を依頼する場合は、このドキュメントと関連する `docs/` 配下の設計ドキュメントを確認してから進める。
 
@@ -303,10 +303,11 @@ Firebase、Next.js、Firestore Security Rules は実装時の選択肢が多い�
 
 実施すること:
 
-- `docs/01-purpose.md` から `docs/09-implementation-plan.md` までを読み直す
+- `docs/01-purpose.md` から `docs/10-data-flow.md` までを読み直す
 - 実装済みの機能が MVP スコープから外れていないか確認する
 - `docs/04-requirements.md` の機能要件と実装済み機能を照合する
 - `docs/05-data-model.md` のデータ設計と Firestore 実装を照合する
+- `docs/10-data-flow.md` の処理フローと登録・投稿処理の実装を照合する
 - `docs/06-screens.md` の画面設計と実装済み画面を照合する
 - `docs/07-tech-stack.md` の技術方針と実装方針を照合する
 - `docs/08-test-policy.md` のテスト方針と実装予定のテストを照合する
@@ -495,4 +496,4 @@ docs/09-implementation-plan.md を読んで、Phase 1「データと認証の土
 - 各 Phase の目的が明確である
 - 各実装ステップの完了条件が明確である
 - 新しい作業チャットでも実装範囲を理解できる
-- `docs/01-purpose.md` から `docs/08-test-policy.md` までの設計と矛盾しない
+- `docs/01-purpose.md` から `docs/10-data-flow.md` までの設計と矛盾しない
