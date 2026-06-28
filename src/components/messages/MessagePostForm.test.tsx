@@ -7,7 +7,7 @@ import { memberUser } from '@/test/factories';
 import { VALIDATION_LIMITS } from '@/utils/validation';
 
 describe('MessagePostForm', () => {
-  it('shows a validation error for blank messages', async () => {
+  it('メッセージが空の場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
 
     render(
@@ -25,7 +25,7 @@ describe('MessagePostForm', () => {
     ).toBeInTheDocument();
   });
 
-  it('submits a trimmed message with the logged-in user', async () => {
+  it('前後の空白を除去したメッセージをログインユーザーとともに送信する', async () => {
     const user = userEvent.setup();
     const onCreateMessage = vi.fn().mockResolvedValue(undefined);
 
@@ -53,7 +53,7 @@ describe('MessagePostForm', () => {
     expect(screen.getByLabelText('メッセージ本文')).toHaveValue('');
   });
 
-  it('shows a validation error when message body exceeds the max length', async () => {
+  it('メッセージ本文が上限を超える場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
     const onCreateMessage = vi.fn();
 

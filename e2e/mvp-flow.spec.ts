@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 const password = 'password123';
 
-test('admin and member can complete the minimum business chat flow', async ({
+test('管理者と一般ユーザーが最小限のビジネスチャット操作を完了できる', async ({
   browser,
   page,
 }) => {

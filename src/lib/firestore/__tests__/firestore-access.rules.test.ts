@@ -143,7 +143,7 @@ describe('firestore.rules access control', () => {
     );
   });
 
-  it('adminユーザーは所属テナントにチャンネルを作成できる', async () => {
+  it('管理者ユーザーは所属テナントにチャンネルを作成できる', async () => {
     const db = testEnv.authenticatedContext(adminAlphaUid).firestore();
     const channelId = 'channel-alpha-admin-created';
 
@@ -160,7 +160,7 @@ describe('firestore.rules access control', () => {
     );
   });
 
-  it('memberユーザーはチャンネルを作成できない', async () => {
+  it('一般ユーザーはチャンネルを作成できない', async () => {
     const db = testEnv.authenticatedContext(memberAlphaUid).firestore();
     const channelId = 'channel-alpha-member-created';
 

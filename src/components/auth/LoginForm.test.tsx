@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 describe('LoginForm', () => {
-  it('shows a validation error when email is empty', async () => {
+  it('メールアドレスが空の場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
 
     render(<LoginForm onLogin={vi.fn()} onSuccess={vi.fn()} />);

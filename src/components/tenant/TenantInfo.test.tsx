@@ -5,14 +5,14 @@ import { TenantInfo } from '@/components/tenant/TenantInfo';
 import { adminUser, memberUser, tenant } from '@/test/factories';
 
 describe('TenantInfo', () => {
-  it('shows join code for admin users', () => {
+  it('管理者ユーザーに参加コードを表示する', () => {
     render(<TenantInfo tenant={tenant} appUser={adminUser} />);
 
     expect(screen.getByText('参加コード')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });
 
-  it('hides join code for member users', () => {
+  it('一般ユーザーに参加コードを表示しない', () => {
     render(<TenantInfo tenant={tenant} appUser={memberUser} />);
 
     expect(screen.queryByText('参加コード')).not.toBeInTheDocument();

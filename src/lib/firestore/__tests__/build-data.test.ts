@@ -71,7 +71,7 @@ describe('firestore build-data', () => {
       expect(data.updatedAt).toBeDefined();
     });
 
-    it('説明がundefinedの場合は保存用データから除外する', () => {
+    it('説明が undefined の場合は保存用データから除外する', () => {
       const data = buildChannelData({
         id: 'channel-001',
         tenantId: 'tenant-001',

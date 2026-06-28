@@ -25,7 +25,7 @@ function renderChannelsPanel(input?: {
 }
 
 describe('ChannelsPanel', () => {
-  it('shows channel create form for admin users', () => {
+  it('管理者ユーザーにチャンネル作成フォームを表示する', () => {
     renderChannelsPanel({ appUser: adminUser });
 
     expect(screen.getByText('チャンネル作成')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('ChannelsPanel', () => {
     ).toBeInTheDocument();
   });
 
-  it('hides channel create form for member users', () => {
+  it('一般ユーザーにチャンネル作成フォームを表示しない', () => {
     renderChannelsPanel({ appUser: memberUser });
 
     expect(screen.queryByText('チャンネル作成')).not.toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('ChannelsPanel', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows a validation error when channel name exceeds the max length', async () => {
+  it('チャンネル名が上限を超える場合はバリデーションエラーを表示する', async () => {
     const { default: userEvent } = await import('@testing-library/user-event');
     const user = userEvent.setup();
     const onCreateChannel = vi.fn();
@@ -63,7 +63,7 @@ describe('ChannelsPanel', () => {
     expect(onCreateChannel).not.toHaveBeenCalled();
   });
 
-  it('shows a validation error when channel description exceeds the max length', async () => {
+  it('チャンネル説明が上限を超える場合はバリデーションエラーを表示する', async () => {
     const { default: userEvent } = await import('@testing-library/user-event');
     const user = userEvent.setup();
     const onCreateChannel = vi.fn();
@@ -84,7 +84,7 @@ describe('ChannelsPanel', () => {
     expect(onCreateChannel).not.toHaveBeenCalled();
   });
 
-  it('creates a channel without a description field when the description is empty', async () => {
+  it('チャンネル説明が空の場合はdescriptionフィールドを含めずに作成する', async () => {
     const { default: userEvent } = await import('@testing-library/user-event');
     const user = userEvent.setup();
     const onCreateChannel = vi.fn().mockResolvedValue(undefined);

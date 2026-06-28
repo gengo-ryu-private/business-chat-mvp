@@ -5,7 +5,7 @@ import { MessageList } from '@/components/messages/MessageList';
 import { message } from '@/test/factories';
 
 describe('MessageList', () => {
-  it('shows sender name, date, and body', () => {
+  it('送信者名、日時、本文を表示する', () => {
     render(
       <MessageList messages={[message]} loading={false} errorMessage="" />
     );
@@ -15,7 +15,7 @@ describe('MessageList', () => {
     expect(screen.getByText(/2026/)).toBeInTheDocument();
   });
 
-  it('shows an empty state when there are no messages', () => {
+  it('メッセージがない場合は空の状態を表示する', () => {
     render(<MessageList messages={[]} loading={false} errorMessage="" />);
 
     expect(

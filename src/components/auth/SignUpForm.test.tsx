@@ -24,7 +24,7 @@ function renderSignUpForm(input?: {
 }
 
 describe('SignUpForm', () => {
-  it('switches tenant-specific fields by signup mode', async () => {
+  it('登録方法に応じてテナント固有の入力欄を切り替える', async () => {
     const user = userEvent.setup();
     renderSignUpForm();
 
@@ -37,7 +37,7 @@ describe('SignUpForm', () => {
     expect(screen.queryByLabelText('テナント名')).not.toBeInTheDocument();
   });
 
-  it('shows a validation error when display name is empty', async () => {
+  it('ユーザー名が空の場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
     renderSignUpForm();
 
@@ -48,7 +48,7 @@ describe('SignUpForm', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a validation error when display name exceeds the max length', async () => {
+  it('ユーザー名が上限を超える場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
     const onCreateTenant = vi.fn();
     renderSignUpForm({ onCreateTenant });
@@ -67,7 +67,7 @@ describe('SignUpForm', () => {
     expect(onCreateTenant).not.toHaveBeenCalled();
   });
 
-  it('shows a validation error when join code has invalid characters', async () => {
+  it('参加コードに不正な文字が含まれる場合はバリデーションエラーを表示する', async () => {
     const user = userEvent.setup();
     const onJoinTenant = vi.fn();
     renderSignUpForm({ onJoinTenant });
