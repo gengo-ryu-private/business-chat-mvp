@@ -70,6 +70,18 @@ describe('firestore build-data', () => {
       expect(data.createdAt).toBeDefined();
       expect(data.updatedAt).toBeDefined();
     });
+
+    it('説明がundefinedの場合は保存用データから除外する', () => {
+      const data = buildChannelData({
+        id: 'channel-001',
+        tenantId: 'tenant-001',
+        name: 'general',
+        description: undefined,
+        createdBy: 'user-001',
+      });
+
+      expect(data).not.toHaveProperty('description');
+    });
   });
 
   describe('buildMessageData', () => {

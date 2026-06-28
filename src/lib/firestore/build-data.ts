@@ -24,8 +24,11 @@ export function buildTenantData(input: CreateTenantInput) {
 }
 
 export function buildChannelData(input: CreateChannelInput) {
+  const { description, ...requiredFields } = input;
+
   return {
-    ...input,
+    ...requiredFields,
+    ...(description === undefined ? {} : { description }),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };

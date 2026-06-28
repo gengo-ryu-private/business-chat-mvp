@@ -83,4 +83,22 @@ describe('ChannelsPanel', () => {
     ).toBeInTheDocument();
     expect(onCreateChannel).not.toHaveBeenCalled();
   });
+
+  it('creates a channel without a description field when the description is empty', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event');
+    const user = userEvent.setup();
+    const onCreateChannel = vi.fn().mockResolvedValue(undefined);
+    renderChannelsPanel({ onCreateChannel });
+
+    await user.type(screen.getByLabelText('チャンネル名'), 'random');
+    await user.click(screen.getByRole('button', { name: 'チャンネルを作成' }));
+
+    expect(onCreateChannel).toHaveBeenCalledOnce();
+    expect(onCreateChannel).toHaveBeenCalledWith({
+      tenantId: adminUser.tenantId,
+      name: 'random',
+      createdBy: adminUser.id,
+    });
+    expect(onCreateChannel.mock.calls[0][0]).not.toHaveProperty('description');
+  });
 });

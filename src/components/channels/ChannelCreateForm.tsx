@@ -92,7 +92,9 @@ export function ChannelCreateForm({
       await onCreateChannel({
         tenantId: appUser.tenantId,
         name: trimmedChannelName,
-        description: trimmedChannelDescription || undefined,
+        ...(trimmedChannelDescription
+          ? { description: trimmedChannelDescription }
+          : {}),
         createdBy: appUser.id,
       });
 
