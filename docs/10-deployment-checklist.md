@@ -9,31 +9,31 @@
 
 ## デモ情報
 
-| 項目                 | 内容 |
-| -------------------- | ---- |
-| デモ URL             | TODO |
-| デモアカウント       | TODO |
-| デモアカウントの権限 | TODO |
-| デプロイ先           | TODO |
-| デプロイ日           | TODO |
+| 項目                 | 内容                                                                           |
+| -------------------- | ------------------------------------------------------------------------------ |
+| デモ URL             | [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/) |
+| デモアカウント       | TODO                                                                           |
+| デモアカウントの権限 | TODO                                                                           |
+| デプロイ先           | Vercel                                                                         |
+| デプロイ日           | 2026-06-28                                                                     |
 
 ## デプロイ前確認
 
-- [ ] 本番用 Firebase プロジェクトが用意されている
-- [ ] デプロイ先が Next.js Route Handler を実行できる
-- [ ] Firebase Authentication のメールアドレス/パスワード認証が有効になっている
-- [ ] Firebase Authentication の承認済みドメインに本番ドメインが登録されている
-- [ ] Firestore Database が作成されている
-- [ ] Firestore Security Rules が本番用に反映されている
-- [ ] Firebase Admin SDK 用のサーバー側環境変数が設定されている
-- [ ] `NEXT_PUBLIC_` で始まる Firebase Client SDK 用環境変数が設定されている
-- [ ] `FIREBASE_PRIVATE_KEY` がサーバー側の秘密情報として扱われている
-- [ ] `NEXT_PUBLIC_USE_FIREBASE_EMULATOR` が本番で有効になっていない
+- [x] 本番用 Firebase プロジェクトが用意されている
+- [x] デプロイ先が Next.js Route Handler を実行できる
+- [x] Firebase Authentication のメールアドレス/パスワード認証が有効になっている
+- [x] Firebase Authentication の承認済みドメインに本番ドメインが登録されている
+- [x] Firestore Database が作成されている
+- [x] Firestore Security Rules が本番用に反映されている
+- [x] Firebase Admin SDK 用のサーバー側環境変数が設定されている
+- [x] `NEXT_PUBLIC_` で始まる Firebase Client SDK 用環境変数が設定されている
+- [x] `FIREBASE_PRIVATE_KEY` がサーバー側の秘密情報として扱われている
+- [x] `NEXT_PUBLIC_USE_FIREBASE_EMULATOR` が本番で有効になっていない
 - [ ] `npm run lint` が成功している
 - [ ] `npm run test -- --run` が成功している
 - [ ] `npm run test:rules` が成功している
 - [ ] `npm run test:e2e` が成功している
-- [ ] `npm run build` が成功している
+- [x] `npm run build` が成功している
 
 ## 本番確認項目
 
@@ -55,7 +55,7 @@
 
 ## README更新時に反映する項目
 
-- [ ] デモ URL
+- [x] デモ URL
 - [ ] スクリーンショット
 - [ ] デモアカウントの扱い
 

@@ -6,7 +6,7 @@
 
 ## デモ
 
-デモ URL: TODO
+デモ URL: [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/)
 
 スクリーンショット: TODO
 
