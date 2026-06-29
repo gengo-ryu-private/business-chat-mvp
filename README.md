@@ -8,7 +8,13 @@
 
 デモ URL: [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/)
 
-スクリーンショット: TODO
+デモアカウントは用意していません。新規登録画面からテナントとユーザーを作成して動作を確認できます。
+
+<img
+  src="./docs/images/channel-detail.png"
+  alt="チャンネル内でのメッセージ共有"
+  width="800"
+/>
 
 ## 作成目的
 
