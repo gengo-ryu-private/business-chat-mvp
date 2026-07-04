@@ -7,6 +7,7 @@ import {
   buildAdminUserData,
   buildMemberUserData,
   buildSignupTenantData,
+  buildSignupTenantSecretData,
   SignupApiError,
   validateCreateTenantSignupInput,
   validateJoinTenantSignupInput,
@@ -25,20 +26,32 @@ export async function createTenantSignup(
 
   const authUser = await createAuthUser(input);
   const tenantRef = adminDb.collection('tenants').doc();
+  const tenantSecretRef = adminDb.collection('tenantSecrets').doc(tenantRef.id);
   let tenantCreated = false;
 
   try {
     const timestamp = FieldValue.serverTimestamp();
 
-    await tenantRef.set(
+    const joinCode = await generateUniqueJoinCode();
+    const batch = adminDb.batch();
+    batch.set(
+      tenantRef,
       buildSignupTenantData({
         tenantId: tenantRef.id,
         tenantName: input.tenantName,
-        joinCode: await generateUniqueJoinCode(),
         createdBy: authUser.uid,
         timestamp,
       })
     );
+    batch.set(
+      tenantSecretRef,
+      buildSignupTenantSecretData({
+        tenantId: tenantRef.id,
+        joinCode,
+        timestamp,
+      })
+    );
+    await batch.commit();
     tenantCreated = true;
 
     await adminDb
@@ -130,7 +143,7 @@ async function findTenantByJoinCode(
   joinCode: string
 ): Promise<{ id: string } | null> {
   const snapshot = await adminDb
-    .collection('tenants')
+    .collection('tenantSecrets')
     .where('joinCode', '==', joinCode)
     .limit(1)
     .get();
@@ -139,7 +152,7 @@ async function findTenantByJoinCode(
     return null;
   }
 
-  return { id: snapshot.docs[0].id };
+  return { id: snapshot.docs[0].get('tenantId') as string };
 }
 
 async function cleanupFailedCreateTenantSignup(input: {
@@ -150,7 +163,8 @@ async function cleanupFailedCreateTenantSignup(input: {
 
   if (input.tenantId) {
     cleanupTasks.push(
-      adminDb.collection('tenants').doc(input.tenantId).delete()
+      adminDb.collection('tenants').doc(input.tenantId).delete(),
+      adminDb.collection('tenantSecrets').doc(input.tenantId).delete()
     );
   }
 

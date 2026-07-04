@@ -23,8 +23,13 @@ export type JoinTenantSignupInput = {
 export type BuildTenantDataInput = {
   tenantId: string;
   tenantName: string;
-  joinCode: string;
   createdBy: string;
+  timestamp: unknown;
+};
+
+export type BuildTenantSecretDataInput = {
+  tenantId: string;
+  joinCode: string;
   timestamp: unknown;
 };
 
@@ -80,8 +85,16 @@ export function buildSignupTenantData(input: BuildTenantDataInput) {
   return {
     id: input.tenantId,
     name: input.tenantName.trim(),
-    joinCode: input.joinCode,
     createdBy: input.createdBy,
+    createdAt: input.timestamp,
+    updatedAt: input.timestamp,
+  };
+}
+
+export function buildSignupTenantSecretData(input: BuildTenantSecretDataInput) {
+  return {
+    tenantId: input.tenantId,
+    joinCode: input.joinCode,
     createdAt: input.timestamp,
     updatedAt: input.timestamp,
   };

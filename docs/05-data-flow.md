@@ -26,7 +26,7 @@
 2. Route Handlerへユーザー名、メールアドレス、パスワード、テナント名を送信する
 3. Route Handlerで同じ入力値を再検証する
 4. Firebase Admin SDKで認証ユーザーを作成する
-5. 参加コードを生成し、`tenants/{tenantId}`を作成する
+5. 参加コードを生成し、`tenants/{tenantId}`と`tenantSecrets/{tenantId}`を作成する
 6. `role`を`admin`に固定し、`users/{userId}`を作成する
 7. ブラウザから作成したメールアドレスとパスワードでログインする
 
@@ -37,7 +37,7 @@
 1. ブラウザで入力値を検証する
 2. Route Handlerへユーザー名、メールアドレス、パスワード、参加コードを送信する
 3. Route Handlerで同じ入力値を再検証する
-4. Firebase Admin SDKで参加コードに一致するテナントを検索する
+4. Firebase Admin SDKで`tenantSecrets`から参加コードに一致するテナントIDを検索する
 5. Firebase Admin SDKで認証ユーザーを作成する
 6. 検索結果の`tenantId`を使用し、`role`を`member`に固定して`users/{userId}`を作成する
 7. ブラウザから作成したメールアドレスとパスワードでログインする

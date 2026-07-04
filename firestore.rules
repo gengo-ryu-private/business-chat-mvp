@@ -67,7 +67,7 @@ service cloud.firestore {
     // Note:
     // Signup and tenant joining are handled by Next.js Route Handlers with
     // Firebase Admin SDK. Client SDK access does not need to create users or
-    // tenants, nor search tenants by joinCode.
+    // tenants or tenant secrets, nor search secrets by joinCode.
 
     match /tenants/{tenantId} {
       allow read: if isTenantMember(tenantId);
@@ -108,6 +108,11 @@ service cloud.firestore {
           allow update, delete: if false;
         }
       }
+    }
+
+    match /tenantSecrets/{tenantId} {
+      allow read: if isTenantAdmin(tenantId);
+      allow create, update, delete: if false;
     }
   }
 }

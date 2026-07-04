@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { TenantInfo } from '@/components/tenant/TenantInfo';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { getTenant } from '@/lib/firestore/tenants';
-import type { Tenant } from '@/types/models';
+import { getTenant, getTenantSecret } from '@/lib/firestore/tenants';
+import type { Tenant, TenantSecret } from '@/types/models';
+import { isAdmin } from '@/utils/permissions';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -17,20 +18,26 @@ function TenantContent() {
   const { appUser } = useAuth();
 
   const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [tenantSecret, setTenantSecret] = useState<TenantSecret | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [secretErrorMessage, setSecretErrorMessage] = useState('');
 
   useEffect(() => {
     async function fetchTenant() {
       if (!appUser) {
         setTenant(null);
+        setTenantSecret(null);
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
+        setTenant(null);
+        setTenantSecret(null);
         setErrorMessage('');
+        setSecretErrorMessage('');
 
         const fetchedTenant = await getTenant(appUser.tenantId);
 
@@ -40,6 +47,19 @@ function TenantContent() {
         }
 
         setTenant(fetchedTenant);
+
+        if (isAdmin(appUser)) {
+          try {
+            const fetchedTenantSecret = await getTenantSecret(appUser.tenantId);
+            setTenantSecret(fetchedTenantSecret);
+
+            if (!fetchedTenantSecret) {
+              setSecretErrorMessage('参加コード情報が見つかりません。');
+            }
+          } catch {
+            setSecretErrorMessage('参加コード情報の取得に失敗しました。');
+          }
+        }
       } catch {
         setErrorMessage('テナント情報の取得に失敗しました。');
       } finally {
@@ -71,8 +91,18 @@ function TenantContent() {
         </Alert>
       )}
 
+      {secretErrorMessage && (
+        <Alert variant="destructive">
+          <AlertDescription>{secretErrorMessage}</AlertDescription>
+        </Alert>
+      )}
+
       {!loading && tenant && appUser && (
-        <TenantInfo tenant={tenant} appUser={appUser} />
+        <TenantInfo
+          tenant={tenant}
+          appUser={appUser}
+          tenantSecret={tenantSecret}
+        />
       )}
     </main>
   );

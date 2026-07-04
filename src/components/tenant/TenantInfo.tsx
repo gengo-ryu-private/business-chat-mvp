@@ -10,15 +10,16 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import type { AppUser, Tenant } from '@/types/models';
+import type { AppUser, Tenant, TenantSecret } from '@/types/models';
 import { isAdmin } from '@/utils/permissions';
 
 type TenantInfoProps = {
   tenant: Tenant;
   appUser: AppUser;
+  tenantSecret: TenantSecret | null;
 };
 
-export function TenantInfo({ tenant, appUser }: TenantInfoProps) {
+export function TenantInfo({ tenant, appUser, tenantSecret }: TenantInfoProps) {
   return (
     <Card>
       <CardHeader>
@@ -51,12 +52,12 @@ export function TenantInfo({ tenant, appUser }: TenantInfoProps) {
           </dt>
           <dd>{appUser.role}</dd>
 
-          {isAdmin(appUser) && (
+          {isAdmin(appUser) && tenantSecret && (
             <>
               <dt className="text-sm font-medium text-muted-foreground">
                 参加コード
               </dt>
-              <dd>{tenant.joinCode}</dd>
+              <dd>{tenantSecret.joinCode}</dd>
             </>
           )}
         </dl>

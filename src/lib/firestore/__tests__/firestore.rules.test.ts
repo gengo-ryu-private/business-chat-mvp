@@ -35,7 +35,6 @@ beforeEach(async () => {
     await db.doc(`tenants/${tenantId}`).set({
       id: tenantId,
       name: 'テストテナント',
-      joinCode: 'ABC234',
       createdBy: adminUserId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),

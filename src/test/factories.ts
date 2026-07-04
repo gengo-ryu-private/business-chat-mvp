@@ -1,6 +1,12 @@
 import { Timestamp } from 'firebase/firestore';
 
-import type { AppUser, Channel, Message, Tenant } from '@/types/models';
+import type {
+  AppUser,
+  Channel,
+  Message,
+  Tenant,
+  TenantSecret,
+} from '@/types/models';
 
 const now = Timestamp.fromDate(new Date('2026-05-11T08:00:00.000Z'));
 
@@ -27,8 +33,14 @@ export const memberUser: AppUser = {
 export const tenant: Tenant = {
   id: 'tenant-1',
   name: 'テストテナント',
-  joinCode: 'TEST123',
   createdBy: adminUser.id,
+  createdAt: now,
+  updatedAt: now,
+};
+
+export const tenantSecret: TenantSecret = {
+  tenantId: tenant.id,
+  joinCode: 'TEST123',
   createdAt: now,
   updatedAt: now,
 };

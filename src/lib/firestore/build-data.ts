@@ -5,6 +5,7 @@ import type {
   CreateChannelInput,
   CreateMessageInput,
   CreateTenantInput,
+  CreateTenantSecretInput,
 } from '@/types/models';
 
 export function buildAppUserData(input: CreateAppUserInput) {
@@ -16,6 +17,14 @@ export function buildAppUserData(input: CreateAppUserInput) {
 }
 
 export function buildTenantData(input: CreateTenantInput) {
+  return {
+    ...input,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
+export function buildTenantSecretData(input: CreateTenantSecretInput) {
   return {
     ...input,
     createdAt: serverTimestamp(),

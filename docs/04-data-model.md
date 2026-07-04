@@ -46,10 +46,20 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 | ---------- | --------- | ---- | ---------- | ----------------------------------- |
 | id         | string    | 必須 | テナントID | ドキュメントIDと一致                |
 | name       | string    | 必須 | テナント名 | -                                   |
-| joinCode   | string    | 必須 | 参加コード | -                                   |
 | createdBy  | string    | 必須 | 作成者ID   | 作成者のFirebase Authentication UID |
 | createdAt  | timestamp | 必須 | 作成日時   | サーバー側で設定                    |
 | updatedAt  | timestamp | 必須 | 更新日時   | サーバー側で設定                    |
+
+## tenantSecrets
+
+パス: `tenantSecrets/{tenantId}`
+
+| フィールド | 型        | 必須 | 内容       | 制約                        |
+| ---------- | --------- | ---- | ---------- | --------------------------- |
+| tenantId   | string    | 必須 | テナントID | ドキュメントIDと一致        |
+| joinCode   | string    | 必須 | 参加コード | adminのみクライアント参照可 |
+| createdAt  | timestamp | 必須 | 作成日時   | サーバー側で設定            |
+| updatedAt  | timestamp | 必須 | 更新日時   | サーバー側で設定            |
 
 ## channels
 
@@ -83,6 +93,7 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 
 ```text
 User ── belongs to ──> Tenant
+Tenant ── has one ──> TenantSecret
 Tenant ── has many ──> Channel
 Channel ── has many ──> Message
 Message ── belongs to ──> User
@@ -96,7 +107,7 @@ Message ── belongs to ──> User
 | -------------------- | ------------------------------------------------------ |
 | ログインユーザー取得 | `users/{userId}`をUIDで取得                            |
 | 所属テナント取得     | `tenants/{tenantId}`をユーザーの`tenantId`で取得       |
-| 参加先テナント検索   | `joinCode`の一致するテナントを検索                     |
+| 参加先テナント検索   | `tenantSecrets`から`joinCode`の一致する文書を検索      |
 | チャンネル一覧取得   | `tenants/{tenantId}/channels`を`createdAt`の昇順で取得 |
 | メッセージ一覧取得   | チャンネル配下の`messages`を`createdAt`の昇順で取得    |
 

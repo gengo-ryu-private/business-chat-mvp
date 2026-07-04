@@ -15,8 +15,14 @@ export type AppUser = {
 export type Tenant = {
   id: string;
   name: string;
-  joinCode: string;
   createdBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+};
+
+export type TenantSecret = {
+  tenantId: string;
+  joinCode: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
@@ -44,6 +50,11 @@ export type Message = {
 export type CreateAppUserInput = Omit<AppUser, 'createdAt' | 'updatedAt'>;
 
 export type CreateTenantInput = Omit<Tenant, 'createdAt' | 'updatedAt'>;
+
+export type CreateTenantSecretInput = Omit<
+  TenantSecret,
+  'createdAt' | 'updatedAt'
+>;
 
 export type CreateChannelInput = Omit<Channel, 'createdAt' | 'updatedAt'>;
 

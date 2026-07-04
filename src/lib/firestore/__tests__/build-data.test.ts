@@ -5,6 +5,7 @@ import {
   buildChannelData,
   buildMessageData,
   buildTenantData,
+  buildTenantSecretData,
 } from '@/lib/firestore/build-data';
 
 describe('firestore build-data', () => {
@@ -35,15 +36,29 @@ describe('firestore build-data', () => {
       const data = buildTenantData({
         id: 'tenant-001',
         name: 'サンプル開発チーム',
-        joinCode: 'ABC123',
         createdBy: 'user-001',
       });
 
       expect(data).toMatchObject({
         id: 'tenant-001',
         name: 'サンプル開発チーム',
-        joinCode: 'ABC123',
         createdBy: 'user-001',
+      });
+      expect(data.createdAt).toBeDefined();
+      expect(data.updatedAt).toBeDefined();
+    });
+  });
+
+  describe('buildTenantSecretData', () => {
+    it('参加コード保存用データに作成日時と更新日時を付与する', () => {
+      const data = buildTenantSecretData({
+        tenantId: 'tenant-001',
+        joinCode: 'ABC123',
+      });
+
+      expect(data).toMatchObject({
+        tenantId: 'tenant-001',
+        joinCode: 'ABC123',
       });
       expect(data.createdAt).toBeDefined();
       expect(data.updatedAt).toBeDefined();

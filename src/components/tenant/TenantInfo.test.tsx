@@ -2,18 +2,26 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { TenantInfo } from '@/components/tenant/TenantInfo';
-import { adminUser, memberUser, tenant } from '@/test/factories';
+import { adminUser, memberUser, tenant, tenantSecret } from '@/test/factories';
 
 describe('TenantInfo', () => {
   it('管理者ユーザーに参加コードを表示する', () => {
-    render(<TenantInfo tenant={tenant} appUser={adminUser} />);
+    render(
+      <TenantInfo
+        tenant={tenant}
+        appUser={adminUser}
+        tenantSecret={tenantSecret}
+      />
+    );
 
     expect(screen.getByText('参加コード')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });
 
   it('一般ユーザーに参加コードを表示しない', () => {
-    render(<TenantInfo tenant={tenant} appUser={memberUser} />);
+    render(
+      <TenantInfo tenant={tenant} appUser={memberUser} tenantSecret={null} />
+    );
 
     expect(screen.queryByText('参加コード')).not.toBeInTheDocument();
     expect(screen.queryByText('TEST123')).not.toBeInTheDocument();

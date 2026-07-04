@@ -8,7 +8,7 @@ import {
 } from '@firebase/rules-unit-testing';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const projectId = 'business-chat-mvp-e2e';
 
@@ -41,7 +41,6 @@ beforeEach(async () => {
     await db.doc(`tenants/${tenantAlphaId}`).set({
       id: tenantAlphaId,
       name: 'Alpha Company',
-      joinCode: 'ALPHA2',
       createdBy: adminAlphaUid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -50,8 +49,21 @@ beforeEach(async () => {
     await db.doc(`tenants/${tenantBetaId}`).set({
       id: tenantBetaId,
       name: 'Beta Company',
-      joinCode: 'BETA34',
       createdBy: adminBetaUid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await db.doc(`tenantSecrets/${tenantAlphaId}`).set({
+      tenantId: tenantAlphaId,
+      joinCode: 'ALPHA2',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await db.doc(`tenantSecrets/${tenantBetaId}`).set({
+      tenantId: tenantBetaId,
+      joinCode: 'BETA34',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -141,6 +153,24 @@ describe('firestore.rules access control', () => {
     await assertFails(
       db.doc(`tenants/${tenantBetaId}/channels/${channelBetaId}`).get()
     );
+  });
+
+  it('管理者だけが所属テナントの参加コードを読める', async () => {
+    const adminDb = testEnv.authenticatedContext(adminAlphaUid).firestore();
+    const memberDb = testEnv.authenticatedContext(memberAlphaUid).firestore();
+
+    await assertSucceeds(adminDb.doc(`tenantSecrets/${tenantAlphaId}`).get());
+    await assertFails(adminDb.doc(`tenantSecrets/${tenantBetaId}`).get());
+    await assertFails(memberDb.doc(`tenantSecrets/${tenantAlphaId}`).get());
+  });
+
+  it('所属テナント本体には参加コードが含まれない', async () => {
+    const db = testEnv.authenticatedContext(memberAlphaUid).firestore();
+    const snapshot = await assertSucceeds(
+      db.doc(`tenants/${tenantAlphaId}`).get()
+    );
+
+    expect(snapshot.data()).not.toHaveProperty('joinCode');
   });
 
   it('管理者ユーザーは所属テナントにチャンネルを作成できる', async () => {
@@ -248,7 +278,6 @@ describe('firestore.rules access control', () => {
       db.doc('tenants/tenant-client-created').set({
         id: 'tenant-client-created',
         name: 'Client Created Tenant',
-        joinCode: 'CLNT23',
         createdBy: adminAlphaUid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -260,5 +289,8 @@ describe('firestore.rules access control', () => {
       })
     );
     await assertFails(db.doc(`tenants/${tenantAlphaId}`).delete());
+    await assertFails(
+      db.doc(`tenantSecrets/${tenantAlphaId}`).update({ joinCode: 'CLNT23' })
+    );
   });
 });
