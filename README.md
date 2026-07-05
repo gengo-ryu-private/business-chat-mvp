@@ -8,7 +8,8 @@
 
 デモ URL: [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/)
 
-公開デモでは、環境設定により新規テナント作成を無効化できます。既存テナントへの参加には参加コードが必要です。
+公開デモでは、データ保護のため新規テナント作成を無効化しています。
+デモアカウントは応募先ごとに個別に共有します。
 
 <img
   src="./docs/images/channel-detail.png"
