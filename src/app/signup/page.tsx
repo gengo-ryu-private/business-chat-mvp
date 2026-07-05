@@ -25,6 +25,9 @@ export default function SignUpPage() {
         onCreateTenant={signUpWithNewTenant}
         onJoinTenant={signUpWithJoinCode}
         onSuccess={handleSignUpSuccess}
+        tenantSignupDisabled={
+          process.env.NEXT_PUBLIC_DISABLE_TENANT_SIGNUP === 'true'
+        }
       />
     </GuestGuard>
   );

@@ -8,7 +8,7 @@
 
 デモ URL: [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/)
 
-デモアカウントは用意していません。新規登録画面からテナントとユーザーを作成して動作を確認できます。
+公開デモでは、環境設定により新規テナント作成を無効化できます。既存テナントへの参加には参加コードが必要です。
 
 <img
   src="./docs/images/channel-detail.png"
@@ -88,6 +88,13 @@ npm install
 ```
 
 `.env.local.example` を参考に `.env.local` を作成します。
+
+公開デモで新規テナント作成を止める場合は、デプロイ環境で次の両方を `true` に設定します。`DISABLE_PUBLIC_TENANT_SIGNUP` は Route Handler で作成要求を拒否するための必須設定で、`NEXT_PUBLIC_DISABLE_TENANT_SIGNUP` は画面上の作成導線を非表示にします。未設定または `false` の場合は新規テナントを作成できます。
+
+```dotenv
+DISABLE_PUBLIC_TENANT_SIGNUP=true
+NEXT_PUBLIC_DISABLE_TENANT_SIGNUP=true
+```
 
 開発サーバーを起動します。
 

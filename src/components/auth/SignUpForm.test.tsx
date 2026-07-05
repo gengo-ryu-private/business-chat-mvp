@@ -9,6 +9,7 @@ function renderSignUpForm(input?: {
   onCreateTenant?: ReturnType<typeof vi.fn>;
   onJoinTenant?: ReturnType<typeof vi.fn>;
   onSuccess?: ReturnType<typeof vi.fn>;
+  tenantSignupDisabled?: boolean;
 }) {
   const onCreateTenant = input?.onCreateTenant ?? vi.fn();
   const onJoinTenant = input?.onJoinTenant ?? vi.fn();
@@ -19,6 +20,7 @@ function renderSignUpForm(input?: {
       onCreateTenant={onCreateTenant}
       onJoinTenant={onJoinTenant}
       onSuccess={onSuccess}
+      tenantSignupDisabled={input?.tenantSignupDisabled}
     />
   );
 }
@@ -35,6 +37,19 @@ describe('SignUpForm', () => {
 
     expect(screen.getByLabelText('参加コード')).toBeInTheDocument();
     expect(screen.queryByLabelText('テナント名')).not.toBeInTheDocument();
+  });
+
+  it('新規テナント作成が無効な場合は作成導線を非表示にする', () => {
+    renderSignUpForm({ tenantSignupDisabled: true });
+
+    expect(
+      screen.queryByLabelText('新しいテナントを作成する')
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('テナント名')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('参加コード')).toBeInTheDocument();
+    expect(
+      screen.getByText('参加コードで既存テナントに参加します。')
+    ).toBeInTheDocument();
   });
 
   it('ユーザー名が空の場合はバリデーションエラーを表示する', async () => {

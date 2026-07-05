@@ -42,14 +42,18 @@ type SignUpFormProps = {
   onCreateTenant: (input: SignUpWithNewTenantInput) => Promise<string>;
   onJoinTenant: (input: SignUpWithJoinCodeInput) => Promise<string>;
   onSuccess: (userId: string) => Promise<void> | void;
+  tenantSignupDisabled?: boolean;
 };
 
 export function SignUpForm({
   onCreateTenant,
   onJoinTenant,
   onSuccess,
+  tenantSignupDisabled = false,
 }: SignUpFormProps) {
-  const [mode, setMode] = useState<SignUpMode>('newTenant');
+  const [mode, setMode] = useState<SignUpMode>(
+    tenantSignupDisabled ? 'joinTenant' : 'newTenant'
+  );
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -160,7 +164,9 @@ export function SignUpForm({
         <CardHeader>
           <CardTitle>新規登録</CardTitle>
           <CardDescription>
-            新しいテナントを作成するか、参加コードで既存テナントに参加します。
+            {tenantSignupDisabled
+              ? '参加コードで既存テナントに参加します。'
+              : '新しいテナントを作成するか、参加コードで既存テナントに参加します。'}
           </CardDescription>
         </CardHeader>
 
@@ -169,16 +175,18 @@ export function SignUpForm({
             <fieldset className="space-y-3 rounded-lg border p-4">
               <legend className="px-1 text-sm font-medium">登録方法</legend>
 
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="radio"
-                  name="signupMode"
-                  value="newTenant"
-                  checked={mode === 'newTenant'}
-                  onChange={() => setMode('newTenant')}
-                />
-                新しいテナントを作成する
-              </label>
+              {!tenantSignupDisabled && (
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="signupMode"
+                    value="newTenant"
+                    checked={mode === 'newTenant'}
+                    onChange={() => setMode('newTenant')}
+                  />
+                  新しいテナントを作成する
+                </label>
+              )}
 
               <label className="flex items-center gap-2 text-sm">
                 <input

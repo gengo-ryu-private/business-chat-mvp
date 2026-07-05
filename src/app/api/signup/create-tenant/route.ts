@@ -9,6 +9,16 @@ import { SignupApiError } from '@/lib/server/signup-data';
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  if (process.env.DISABLE_PUBLIC_TENANT_SIGNUP === 'true') {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: 'デモ環境では新規テナント作成を無効化しています。',
+      },
+      { status: 403 }
+    );
+  }
+
   try {
     const input = (await request.json()) as CreateTenantSignupInput;
     await createTenantSignup(input);
