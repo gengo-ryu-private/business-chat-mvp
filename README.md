@@ -97,6 +97,8 @@ DISABLE_PUBLIC_TENANT_SIGNUP=true
 NEXT_PUBLIC_DISABLE_TENANT_SIGNUP=true
 ```
 
+公開デモの signup API では、IPアドレス単位の rate limit に Upstash Redis を使用します。新規テナント作成は1時間に3回、既存テナントへの参加は10分間に5回までに制限します。Vercel では `RATE_LIMIT_ENABLED=true` にした上で、`UPSTASH_REDIS_REST_KV_REST_API_URL` と `UPSTASH_REDIS_REST_KV_REST_API_TOKEN` を設定してください。`RATE_LIMIT_ENABLED` が未設定または `false` の場合、ローカル開発を妨げないよう rate limit は無効になります。
+
 開発サーバーを起動します。
 
 ```bash

@@ -5,10 +5,20 @@ import {
   type CreateTenantSignupInput,
 } from '@/lib/server/signup';
 import { SignupApiError } from '@/lib/server/signup-data';
+import { enforceSignupRateLimit } from '@/lib/server/signup-rate-limit';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  const rateLimitResponse = await enforceSignupRateLimit(
+    request,
+    'create-tenant'
+  );
+
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   if (process.env.DISABLE_PUBLIC_TENANT_SIGNUP === 'true') {
     return NextResponse.json(
       {

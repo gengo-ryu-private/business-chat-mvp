@@ -29,6 +29,9 @@
 - [x] `NEXT_PUBLIC_` で始まる Firebase Client SDK 用環境変数が設定されている
 - [x] `FIREBASE_PRIVATE_KEY` がサーバー側の秘密情報として扱われている
 - [x] `NEXT_PUBLIC_USE_FIREBASE_EMULATOR` が本番で有効になっていない
+- [x] Upstash Redisを作成し、`UPSTASH_REDIS_REST_KV_REST_API_URL` と `UPSTASH_REDIS_REST_KV_REST_API_TOKEN` が設定されている
+- [x] 公開デモで `RATE_LIMIT_ENABLED=true` が設定されている
+- [ ] 新規テナント作成が1時間に3回、既存テナントへの参加が10分間に5回に制限されている
 - [x] `npm run lint` が成功している
 - [x] `npm run test -- --run` が成功している
 - [x] `npm run test:rules` が成功している
@@ -52,6 +55,7 @@
 - [x] 未ログイン状態で認証後画面へアクセスできない
 - [x] 所属テナント外のデータへアクセスできない
 - [x] エラー時に画面上で分かるメッセージが表示される
+- [ ] signup APIの制限超過時に429と再試行を促すメッセージが返る
 
 ## README更新時に反映する項目
 

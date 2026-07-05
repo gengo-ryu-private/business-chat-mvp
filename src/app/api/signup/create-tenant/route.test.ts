@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const { createTenantSignup } = vi.hoisted(() => ({
+const { createTenantSignup, enforceSignupRateLimit } = vi.hoisted(() => ({
   createTenantSignup: vi.fn(),
+  enforceSignupRateLimit: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('@/lib/server/signup', () => ({ createTenantSignup }));
+vi.mock('@/lib/server/signup-rate-limit', () => ({ enforceSignupRateLimit }));
 vi.mock('@/lib/server/signup-data', () => ({
   SignupApiError: class SignupApiError extends Error {
     constructor(
@@ -37,6 +39,28 @@ describe('POST /api/signup/create-tenant', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.clearAllMocks();
+  });
+
+  it('rate limit超過時は作成処理を行わず429を返す', async () => {
+    enforceSignupRateLimit.mockResolvedValueOnce(
+      Response.json(
+        {
+          ok: false,
+          message:
+            'リクエスト回数が多すぎます。しばらく待ってから再試行してください。',
+        },
+        { status: 429 }
+      )
+    );
+
+    const response = await POST(createRequest());
+
+    expect(response.status).toBe(429);
+    expect(enforceSignupRateLimit).toHaveBeenCalledWith(
+      expect.any(Request),
+      'create-tenant'
+    );
+    expect(createTenantSignup).not.toHaveBeenCalled();
   });
 
   it('新規テナント作成が無効な場合は処理を行わず403を返す', async () => {
