@@ -1,13 +1,13 @@
 export const VALIDATION_LIMITS = {
   displayNameMax: 50,
   tenantNameMax: 50,
-  joinCodeLength: 6,
+  joinCodeLength: 10,
   channelNameMax: 50,
   channelDescriptionMax: 200,
   messageBodyMax: 1000,
 } as const;
 
-export const JOIN_CODE_PATTERN = /^[A-HJ-NP-Z2-9]{6}$/;
+export const JOIN_CODE_PATTERN = /^[A-HJ-NP-Z2-9]{10}$/;
 
 export function isRequired(value: string): boolean {
   return value.trim().length > 0;

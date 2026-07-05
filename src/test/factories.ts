@@ -40,7 +40,7 @@ export const tenant: Tenant = {
 
 export const tenantSecret: TenantSecret = {
   tenantId: tenant.id,
-  joinCode: 'TEST123',
+  joinCode: 'TEST234567',
   createdAt: now,
   updatedAt: now,
 };

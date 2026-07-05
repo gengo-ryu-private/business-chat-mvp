@@ -53,12 +53,12 @@ describe('firestore build-data', () => {
     it('参加コード保存用データに作成日時と更新日時を付与する', () => {
       const data = buildTenantSecretData({
         tenantId: 'tenant-001',
-        joinCode: 'ABC123',
+        joinCode: 'ABC2345678',
       });
 
       expect(data).toMatchObject({
         tenantId: 'tenant-001',
-        joinCode: 'ABC123',
+        joinCode: 'ABC2345678',
       });
       expect(data.createdAt).toBeDefined();
       expect(data.updatedAt).toBeDefined();

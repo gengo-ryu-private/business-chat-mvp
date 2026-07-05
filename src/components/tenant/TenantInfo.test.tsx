@@ -15,7 +15,7 @@ describe('TenantInfo', () => {
     );
 
     expect(screen.getByText('参加コード')).toBeInTheDocument();
-    expect(screen.getByText('TEST123')).toBeInTheDocument();
+    expect(screen.getByText('TEST234567')).toBeInTheDocument();
   });
 
   it('一般ユーザーに参加コードを表示しない', () => {
@@ -24,6 +24,6 @@ describe('TenantInfo', () => {
     );
 
     expect(screen.queryByText('参加コード')).not.toBeInTheDocument();
-    expect(screen.queryByText('TEST123')).not.toBeInTheDocument();
+    expect(screen.queryByText('TEST234567')).not.toBeInTheDocument();
   });
 });

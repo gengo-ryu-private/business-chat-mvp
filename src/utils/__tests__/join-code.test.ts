@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { generateJoinCode } from '@/utils/join-code';
 
 describe('join-code utils', () => {
-  it('デフォルトでは6文字の参加コードを生成する', () => {
-    expect(generateJoinCode()).toHaveLength(6);
+  it('デフォルトでは10文字の参加コードを生成する', () => {
+    expect(generateJoinCode()).toHaveLength(10);
   });
 
   it('指定した文字数の参加コードを生成する', () => {
@@ -21,5 +21,14 @@ describe('join-code utils', () => {
     const code = generateJoinCode(100);
 
     expect(code).not.toMatch(/[IO01]/);
+  });
+
+  it('Math.randomを使用しない', () => {
+    const randomSpy = vi.spyOn(Math, 'random');
+
+    generateJoinCode();
+
+    expect(randomSpy).not.toHaveBeenCalled();
+    randomSpy.mockRestore();
   });
 });

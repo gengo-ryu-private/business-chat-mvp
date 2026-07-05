@@ -118,7 +118,7 @@ export function SignUpForm({
       }
 
       if (!isValidJoinCode(trimmedJoinCode)) {
-        setErrorMessage('参加コードは6文字の英数字大文字で入力してください。');
+        setErrorMessage('参加コードは10文字の英数字大文字で入力してください。');
         return;
       }
     }

@@ -76,7 +76,7 @@ export function validateJoinTenantSignupInput(input: JoinTenantSignupInput) {
 
   if (!isValidJoinCode(input.joinCode)) {
     throw new SignupApiError(
-      '参加コードは6文字の英数字大文字で入力してください。'
+      '参加コードは10文字の英数字大文字で入力してください。'
     );
   }
 }

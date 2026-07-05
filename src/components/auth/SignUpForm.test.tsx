@@ -79,11 +79,11 @@ describe('SignUpForm', () => {
       'sato@example.com'
     );
     await user.type(screen.getByLabelText('パスワード'), 'password123');
-    await user.type(screen.getByLabelText('参加コード'), '0OI123');
+    await user.type(screen.getByLabelText('参加コード'), '0OI2345678');
     await user.click(screen.getByRole('button', { name: '登録' }));
 
     expect(
-      screen.getByText('参加コードは6文字の英数字大文字で入力してください。')
+      screen.getByText('参加コードは10文字の英数字大文字で入力してください。')
     ).toBeInTheDocument();
     expect(onJoinTenant).not.toHaveBeenCalled();
   });

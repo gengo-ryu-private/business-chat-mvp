@@ -80,37 +80,37 @@ describe('validation utils', () => {
 
   describe('hasExactLength', () => {
     it('前後空白を除いた文字数が指定文字数と一致する場合 true を返す', () => {
-      expect(hasExactLength(' ABC123 ', VALIDATION_LIMITS.joinCodeLength)).toBe(
-        true
-      );
+      expect(
+        hasExactLength(' ABC2345678 ', VALIDATION_LIMITS.joinCodeLength)
+      ).toBe(true);
     });
 
     it('前後空白を除いた文字数が指定文字数と一致しない場合 false を返す', () => {
-      expect(hasExactLength('ABC12', VALIDATION_LIMITS.joinCodeLength)).toBe(
-        false
-      );
+      expect(
+        hasExactLength('ABC234567', VALIDATION_LIMITS.joinCodeLength)
+      ).toBe(false);
     });
   });
 
   describe('isValidJoinCode', () => {
-    it('6文字の許可文字だけで構成される場合 true を返す', () => {
-      expect(isValidJoinCode('ABC234')).toBe(true);
+    it('10文字の許可文字だけで構成される場合 true を返す', () => {
+      expect(isValidJoinCode('ABC2345678')).toBe(true);
     });
 
     it('誤読しやすい 0/O/I/1 を含む場合 false を返す', () => {
-      expect(isValidJoinCode('0OI123')).toBe(false);
+      expect(isValidJoinCode('0OI2345678')).toBe(false);
     });
 
     it('小文字を含む場合 false を返す', () => {
-      expect(isValidJoinCode('abc234')).toBe(false);
+      expect(isValidJoinCode('abc2345678')).toBe(false);
     });
 
-    it('6文字未満の場合 false を返す', () => {
-      expect(isValidJoinCode('ABC23')).toBe(false);
+    it('10文字未満の場合 false を返す', () => {
+      expect(isValidJoinCode('ABC234567')).toBe(false);
     });
 
-    it('6文字を超える場合 false を返す', () => {
-      expect(isValidJoinCode('ABC2345')).toBe(false);
+    it('10文字を超える場合 false を返す', () => {
+      expect(isValidJoinCode('ABC23456789')).toBe(false);
     });
   });
 });

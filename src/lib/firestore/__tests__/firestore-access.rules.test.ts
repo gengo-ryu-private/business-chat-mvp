@@ -56,14 +56,14 @@ beforeEach(async () => {
 
     await db.doc(`tenantSecrets/${tenantAlphaId}`).set({
       tenantId: tenantAlphaId,
-      joinCode: 'ALPHA2',
+      joinCode: 'ALPHA23456',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
     await db.doc(`tenantSecrets/${tenantBetaId}`).set({
       tenantId: tenantBetaId,
-      joinCode: 'BETA34',
+      joinCode: 'BETA345678',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -290,7 +290,9 @@ describe('firestore.rules access control', () => {
     );
     await assertFails(db.doc(`tenants/${tenantAlphaId}`).delete());
     await assertFails(
-      db.doc(`tenantSecrets/${tenantAlphaId}`).update({ joinCode: 'CLNT23' })
+      db
+        .doc(`tenantSecrets/${tenantAlphaId}`)
+        .update({ joinCode: 'CLNT234567' })
     );
   });
 });

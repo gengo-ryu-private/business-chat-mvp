@@ -84,7 +84,7 @@ describe('signup-data', () => {
           displayName: '佐藤花子',
           email: 'sato@example.com',
           password: 'password123',
-          joinCode: 'ABC234',
+          joinCode: 'ABC2345678',
         })
       ).not.toThrow();
     });
@@ -106,11 +106,11 @@ describe('signup-data', () => {
           displayName: '佐藤花子',
           email: 'sato@example.com',
           password: 'password123',
-          joinCode: '0OI123',
+          joinCode: '0OI2345678',
         })
       ).toThrow(
         new SignupApiError(
-          '参加コードは6文字の英数字大文字で入力してください。'
+          '参加コードは10文字の英数字大文字で入力してください。'
         )
       );
     });
@@ -121,7 +121,7 @@ describe('signup-data', () => {
           displayName: '佐藤花子',
           email: 'invalid-email',
           password: 'password123',
-          joinCode: 'ABC234',
+          joinCode: 'ABC2345678',
         })
       ).toThrow(new SignupApiError('メールアドレスの形式が正しくありません。'));
     });
@@ -155,12 +155,12 @@ describe('signup-data', () => {
       expect(
         buildSignupTenantSecretData({
           tenantId: 'tenant-001',
-          joinCode: 'ABC234',
+          joinCode: 'ABC2345678',
           timestamp,
         })
       ).toEqual({
         tenantId: 'tenant-001',
-        joinCode: 'ABC234',
+        joinCode: 'ABC2345678',
         createdAt: timestamp,
         updatedAt: timestamp,
       });
