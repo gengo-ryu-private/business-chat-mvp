@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import {
-  createTenantSignup,
-  type CreateTenantSignupInput,
-} from '@/lib/server/signup';
+import { createTenantSignup } from '@/lib/server/signup';
+import { createTenantSignupSchema } from '@/lib/signup-schema';
 import { SignupApiError } from '@/lib/server/signup-data';
+import { parseSignupRequest } from '@/lib/server/parse-signup-request';
 import { enforceSignupRateLimit } from '@/lib/server/signup-rate-limit';
 
 export const runtime = 'nodejs';
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const input = (await request.json()) as CreateTenantSignupInput;
+    const input = await parseSignupRequest(request, createTenantSignupSchema);
     await createTenantSignup(input);
 
     return NextResponse.json({ ok: true });

@@ -15,12 +15,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  VALIDATION_LIMITS,
-  isRequired,
-  isValidEmail,
-  isValidJoinCode,
-  isWithinMaxLength,
-} from '@/utils/validation';
+  createTenantSignupSchema,
+  getSignupValidationMessage,
+  joinTenantSignupSchema,
+} from '@/lib/signup-schema';
+import { VALIDATION_LIMITS } from '@/utils/validation';
 
 type SignUpMode = 'newTenant' | 'joinTenant';
 
@@ -70,61 +69,24 @@ export function SignUpForm({
     const trimmedTenantName = tenantName.trim();
     const trimmedJoinCode = joinCode.trim();
 
-    if (!isRequired(trimmedDisplayName)) {
-      setErrorMessage('ユーザー名を入力してください。');
+    const result =
+      mode === 'newTenant'
+        ? createTenantSignupSchema.safeParse({
+            displayName: trimmedDisplayName,
+            email: trimmedEmail,
+            password,
+            tenantName: trimmedTenantName,
+          })
+        : joinTenantSignupSchema.safeParse({
+            displayName: trimmedDisplayName,
+            email: trimmedEmail,
+            password,
+            joinCode: trimmedJoinCode,
+          });
+
+    if (!result.success) {
+      setErrorMessage(getSignupValidationMessage(result.error));
       return;
-    }
-
-    if (
-      !isWithinMaxLength(trimmedDisplayName, VALIDATION_LIMITS.displayNameMax)
-    ) {
-      setErrorMessage(
-        `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`
-      );
-      return;
-    }
-
-    if (!isRequired(trimmedEmail)) {
-      setErrorMessage('メールアドレスを入力してください。');
-      return;
-    }
-
-    if (!isValidEmail(trimmedEmail)) {
-      setErrorMessage('メールアドレスの形式が正しくありません。');
-      return;
-    }
-
-    if (!isRequired(password)) {
-      setErrorMessage('パスワードを入力してください。');
-      return;
-    }
-
-    if (mode === 'newTenant') {
-      if (!isRequired(trimmedTenantName)) {
-        setErrorMessage('テナント名を入力してください。');
-        return;
-      }
-
-      if (
-        !isWithinMaxLength(trimmedTenantName, VALIDATION_LIMITS.tenantNameMax)
-      ) {
-        setErrorMessage(
-          `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`
-        );
-        return;
-      }
-    }
-
-    if (mode === 'joinTenant') {
-      if (!isRequired(trimmedJoinCode)) {
-        setErrorMessage('参加コードを入力してください。');
-        return;
-      }
-
-      if (!isValidJoinCode(trimmedJoinCode)) {
-        setErrorMessage('参加コードは10文字の英数字大文字で入力してください。');
-        return;
-      }
     }
 
     try {
@@ -230,7 +192,15 @@ export function SignUpForm({
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="new-password"
+                aria-describedby="password-requirements"
               />
+              <p
+                id="password-requirements"
+                className="text-sm text-muted-foreground"
+              >
+                {VALIDATION_LIMITS.passwordMin}〜{VALIDATION_LIMITS.passwordMax}
+                文字で、メールアドレスとは異なるものを入力してください。
+              </p>
             </div>
 
             {mode === 'newTenant' ? (

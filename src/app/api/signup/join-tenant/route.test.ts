@@ -27,11 +27,11 @@ const signupInput = {
   joinCode: 'ABCDEFGHJK',
 };
 
-function createRequest() {
+function createRequest(body: BodyInit = JSON.stringify(signupInput)) {
   return new Request('http://localhost/api/signup/join-tenant', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(signupInput),
+    body,
   });
 }
 
@@ -68,5 +68,32 @@ describe('POST /api/signup/join-tenant', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
     expect(joinTenantSignup).toHaveBeenCalledWith(signupInput);
+  });
+
+  it.each([
+    ['不正JSON', '{'],
+    ['null', 'null'],
+    ['配列', '[]'],
+    ['不正な型', JSON.stringify({ ...signupInput, displayName: 123 })],
+    ['余計なプロパティ', JSON.stringify({ ...signupInput, role: 'admin' })],
+  ])('%sは400を返す', async (_, body) => {
+    const response = await POST(createRequest(body));
+
+    expect(response.status).toBe(400);
+    expect(joinTenantSignup).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['短いパスワード', { ...signupInput, password: 'short' }],
+    ['長いパスワード', { ...signupInput, password: 'a'.repeat(73) }],
+    [
+      'メールアドレスと同一のパスワード',
+      { ...signupInput, password: signupInput.email },
+    ],
+  ])('%sは400を返す', async (_, input) => {
+    const response = await POST(createRequest(JSON.stringify(input)));
+
+    expect(response.status).toBe(400);
+    expect(joinTenantSignup).not.toHaveBeenCalled();
   });
 });

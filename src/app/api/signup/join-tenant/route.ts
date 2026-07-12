@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import {
-  joinTenantSignup,
-  type JoinTenantSignupInput,
-} from '@/lib/server/signup';
+import { joinTenantSignupSchema } from '@/lib/signup-schema';
+import { joinTenantSignup } from '@/lib/server/signup';
 import { SignupApiError } from '@/lib/server/signup-data';
+import { parseSignupRequest } from '@/lib/server/parse-signup-request';
 import { enforceSignupRateLimit } from '@/lib/server/signup-rate-limit';
 
 export const runtime = 'nodejs';
@@ -20,7 +19,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const input = (await request.json()) as JoinTenantSignupInput;
+    const input = await parseSignupRequest(request, joinTenantSignupSchema);
     await joinTenantSignup(input);
 
     return NextResponse.json({ ok: true });

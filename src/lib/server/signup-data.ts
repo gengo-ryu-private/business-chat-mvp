@@ -1,24 +1,9 @@
-import {
-  VALIDATION_LIMITS,
-  isRequired,
-  isValidEmail,
-  isValidJoinCode,
-  isWithinMaxLength,
-} from '@/utils/validation';
+import type {
+  CreateTenantSignupInput,
+  JoinTenantSignupInput,
+} from '@/lib/signup-schema';
 
-export type CreateTenantSignupInput = {
-  displayName: string;
-  email: string;
-  password: string;
-  tenantName: string;
-};
-
-export type JoinTenantSignupInput = {
-  displayName: string;
-  email: string;
-  password: string;
-  joinCode: string;
-};
+export type { CreateTenantSignupInput, JoinTenantSignupInput };
 
 export type BuildTenantDataInput = {
   tenantId: string;
@@ -51,36 +36,6 @@ export class SignupApiError extends Error {
   }
 }
 
-export function validateCreateTenantSignupInput(
-  input: CreateTenantSignupInput
-) {
-  validateBaseInput(input);
-
-  if (!isNonEmptyString(input.tenantName)) {
-    throw new SignupApiError('テナント名を入力してください。');
-  }
-
-  if (!isWithinMaxLength(input.tenantName, VALIDATION_LIMITS.tenantNameMax)) {
-    throw new SignupApiError(
-      `テナント名は${VALIDATION_LIMITS.tenantNameMax}文字以内で入力してください。`
-    );
-  }
-}
-
-export function validateJoinTenantSignupInput(input: JoinTenantSignupInput) {
-  validateBaseInput(input);
-
-  if (!isNonEmptyString(input.joinCode)) {
-    throw new SignupApiError('参加コードを入力してください。');
-  }
-
-  if (!isValidJoinCode(input.joinCode)) {
-    throw new SignupApiError(
-      '参加コードは10文字の英数字大文字で入力してください。'
-    );
-  }
-}
-
 export function buildSignupTenantData(input: BuildTenantDataInput) {
   return {
     id: input.tenantId,
@@ -108,34 +63,6 @@ export function buildMemberUserData(input: BuildSignupUserDataInput) {
   return buildSignupUserData(input, 'member');
 }
 
-function validateBaseInput(input: {
-  displayName: string;
-  email: string;
-  password: string;
-}) {
-  if (!isNonEmptyString(input.displayName)) {
-    throw new SignupApiError('ユーザー名を入力してください。');
-  }
-
-  if (!isWithinMaxLength(input.displayName, VALIDATION_LIMITS.displayNameMax)) {
-    throw new SignupApiError(
-      `ユーザー名は${VALIDATION_LIMITS.displayNameMax}文字以内で入力してください。`
-    );
-  }
-
-  if (!isNonEmptyString(input.email)) {
-    throw new SignupApiError('メールアドレスを入力してください。');
-  }
-
-  if (!isValidEmail(input.email)) {
-    throw new SignupApiError('メールアドレスの形式が正しくありません。');
-  }
-
-  if (!isNonEmptyString(input.password)) {
-    throw new SignupApiError('パスワードを入力してください。');
-  }
-}
-
 function buildSignupUserData(
   input: BuildSignupUserDataInput,
   role: 'admin' | 'member'
@@ -149,8 +76,4 @@ function buildSignupUserData(
     createdAt: input.timestamp,
     updatedAt: input.timestamp,
   };
-}
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && isRequired(value);
 }

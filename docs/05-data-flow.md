@@ -10,21 +10,21 @@
 
 ## 責務分担
 
-| 実行場所                 | 責務                                                                   |
-| ------------------------ | ---------------------------------------------------------------------- |
-| ブラウザ                 | 入力、画面上の検証、ログイン後の通常操作                               |
-| Next.js Route Handler    | 登録入力の検証、認証ユーザー作成、テナント作成・検索、所属と権限の決定 |
-| Firebase Admin SDK       | サーバー側からFirebase AuthenticationとFirestoreを操作                 |
-| Firebase Client SDK      | ログイン、ログイン後のデータ取得と作成                                 |
-| Firestore Security Rules | ログイン後のデータ参照・作成を認証状態、`tenantId`、`role`で制御       |
+| 実行場所                 | 責務                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| ブラウザ                 | 入力、画面上のzod検証、ログイン後の通常操作                                     |
+| Next.js Route Handler    | zodによる登録入力の検証、認証ユーザー作成、テナント作成・検索、所属と権限の決定 |
+| Firebase Admin SDK       | サーバー側からFirebase AuthenticationとFirestoreを操作                          |
+| Firebase Client SDK      | ログイン、ログイン後のデータ取得と作成                                          |
+| Firestore Security Rules | ログイン後のデータ参照・作成を認証状態、`tenantId`、`role`で制御                |
 
 登録処理では、`role`や`tenantId`をブラウザの入力から決定せず、Route Handlerが処理内容と参加コードから決定する。
 
 ## 新規テナント作成による登録
 
-1. ブラウザで入力値を検証する
+1. ブラウザでzod schemaにより入力値を検証する
 2. Route Handlerへユーザー名、メールアドレス、パスワード、テナント名を送信する
-3. Route Handlerで同じ入力値を再検証する
+3. Route Handlerで同じzod schemaにより入力値を再検証する
 4. Firebase Admin SDKで認証ユーザーを作成する
 5. 参加コードを生成し、`tenants/{tenantId}`と`tenantSecrets/{tenantId}`を作成する
 6. `role`を`admin`に固定し、`users/{userId}`を作成する
@@ -34,9 +34,9 @@
 
 ## 既存テナント参加による登録
 
-1. ブラウザで入力値を検証する
+1. ブラウザでzod schemaにより入力値を検証する
 2. Route Handlerへユーザー名、メールアドレス、パスワード、参加コードを送信する
-3. Route Handlerで同じ入力値を再検証する
+3. Route Handlerで同じzod schemaにより入力値を再検証する
 4. Firebase Admin SDKで`tenantSecrets`から参加コードに一致するテナントIDを検索する
 5. Firebase Admin SDKで認証ユーザーを作成する
 6. 検索結果の`tenantId`を使用し、`role`を`member`に固定して`users/{userId}`を作成する

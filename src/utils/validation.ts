@@ -1,6 +1,8 @@
 export const VALIDATION_LIMITS = {
   displayNameMax: 50,
   tenantNameMax: 50,
+  passwordMin: 8,
+  passwordMax: 72,
   joinCodeLength: 10,
   channelNameMax: 50,
   channelDescriptionMax: 200,

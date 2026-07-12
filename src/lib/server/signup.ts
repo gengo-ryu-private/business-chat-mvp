@@ -9,8 +9,6 @@ import {
   buildSignupTenantData,
   buildSignupTenantSecretData,
   SignupApiError,
-  validateCreateTenantSignupInput,
-  validateJoinTenantSignupInput,
   type CreateTenantSignupInput,
   type JoinTenantSignupInput,
 } from '@/lib/server/signup-data';
@@ -22,8 +20,6 @@ export type { CreateTenantSignupInput, JoinTenantSignupInput };
 export async function createTenantSignup(
   input: CreateTenantSignupInput
 ): Promise<void> {
-  validateCreateTenantSignupInput(input);
-
   const authUser = await createAuthUser(input);
   const tenantRef = adminDb.collection('tenants').doc();
   const tenantSecretRef = adminDb.collection('tenantSecrets').doc(tenantRef.id);
@@ -78,8 +74,6 @@ export async function createTenantSignup(
 export async function joinTenantSignup(
   input: JoinTenantSignupInput
 ): Promise<void> {
-  validateJoinTenantSignupInput(input);
-
   const tenant = await findTenantByJoinCode(input.joinCode.trim());
 
   if (!tenant) {
