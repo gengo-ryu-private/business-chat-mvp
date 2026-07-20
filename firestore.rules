@@ -114,5 +114,9 @@ service cloud.firestore {
       allow read: if isTenantAdmin(tenantId);
       allow create, update, delete: if false;
     }
+
+    match /demoTenantDeprovisions/{tenantId} {
+      allow read, write: if false;
+    }
   }
 }

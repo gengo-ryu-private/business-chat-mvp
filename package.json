@@ -2,6 +2,9 @@
   "name": "business-chat-mvp",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0 <23"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +14,12 @@
     "format:check": "prettier --check .",
     "test": "vitest",
     "test:rules": "firebase emulators:exec --only firestore --project business-chat-mvp-e2e \"vitest run --config vitest.rules.config.ts\"",
-    "test:e2e": "firebase emulators:exec --project business-chat-mvp-e2e \"playwright test\""
+    "test:demo-cli": "firebase emulators:exec --only auth,firestore --project business-chat-mvp-e2e \"vitest run --config vitest.demo-cli.config.ts\"",
+    "test:e2e": "firebase emulators:exec --project business-chat-mvp-e2e \"playwright test\"",
+    "demo:check": "tsx scripts/demo-tenant.ts check",
+    "demo:provision": "tsx scripts/demo-tenant.ts provision",
+    "demo:reset": "tsx scripts/demo-tenant.ts reset",
+    "demo:deprovision": "tsx scripts/demo-tenant.ts deprovision"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.0.8",
@@ -20,6 +28,7 @@
     "clsx": "^2.1.1",
     "firebase": "^12.12.1",
     "firebase-admin": "^13.9.0",
+    "google-auth-library": "^10.6.2",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
     "radix-ui": "^1.4.3",
@@ -50,6 +59,7 @@
     "jsdom": "^27.0.1",
     "prettier": "^3.8.3",
     "tailwindcss": "^4.2.4",
+    "tsx": "^4.23.1",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^3.2.4"

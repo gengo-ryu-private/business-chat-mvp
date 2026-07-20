@@ -9,7 +9,7 @@
 デモ URL: [https://business-chat-mvp.vercel.app/](https://business-chat-mvp.vercel.app/)
 
 公開デモでは、データ保護のため新規テナント作成を無効化しています。
-デモアカウントは応募先ごとに個別に共有します。
+応募先ごとに専用のデモテナントとアカウントを作成し、その応募先にだけ共有します。
 公開デモの構築とデータ運用は、[デプロイガイド](./docs/10-deployment-guide.md)と[公開デモの運用手順](./docs/11-demo-operations.md)に整理しています。
 
 <img
@@ -73,11 +73,13 @@ Firestore Security Rules では、主に以下を制御しています。
 
 ## テスト
 
-このプロジェクトでは、関数、コンポーネント、E2E、Firestore Security Rules をテスト対象にしています。
+このプロジェクトでは、関数、コンポーネント、E2E、Firestore Security Rules、
+デモテナント運用CLIをテスト対象にしています。
 
 ```bash
 npm run test
 npm run test:rules
+npm run test:demo-cli
 npm run test:e2e
 ```
 
@@ -90,8 +92,6 @@ npm install
 ```
 
 `.env.local.example` を参考に `.env.local` を作成します。
-
-公開デモ用の環境変数とrate limitは、[公開デモのデプロイガイド](./docs/10-deployment-guide.md)を参照してください。
 
 開発サーバーを起動します。
 
