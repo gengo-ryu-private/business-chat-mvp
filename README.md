@@ -73,11 +73,13 @@ Firestore Security Rules では、主に以下を制御しています。
 
 ## テスト
 
-このプロジェクトでは、関数、コンポーネント、E2E、Firestore Security Rules をテスト対象にしています。
+このプロジェクトでは、関数、コンポーネント、E2E、Firestore Security Rules、
+デモテナント運用CLIをテスト対象にしています。
 
 ```bash
 npm run test
 npm run test:rules
+npm run test:demo-cli
 npm run test:e2e
 ```
 

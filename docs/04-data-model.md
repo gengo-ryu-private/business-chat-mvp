@@ -22,6 +22,7 @@ users/{userId}
 tenants/{tenantId}
 tenants/{tenantId}/channels/{channelId}
 tenants/{tenantId}/channels/{channelId}/messages/{messageId}
+demoTenantDeprovisions/{tenantId}
 ```
 
 ## users
@@ -60,6 +61,23 @@ tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 | joinCode   | string    | 必須 | 参加コード | adminのみクライアント参照可 |
 | createdAt  | timestamp | 必須 | 作成日時   | サーバー側で設定            |
 | updatedAt  | timestamp | 必須 | 更新日時   | サーバー側で設定            |
+
+## demoTenantDeprovisions
+
+パス: `demoTenantDeprovisions/{tenantId}`
+
+公開デモ運用CLIが、テナント削除の再試行に必要なUID対応表を保持する非公開メタデータである。
+通常のアプリ機能からは使用せず、Firestore Security Rulesではクライアントの読み書きを許可しない。
+
+| フィールド               | 型        | 必須 | 内容                                   |
+| ------------------------ | --------- | ---- | -------------------------------------- |
+| tenantId                 | string    | 必須 | 削除対象テナントID                     |
+| authUids                 | string[]  | 必須 | 削除・再検証するAuthentication UID一覧 |
+| authenticationVerifiable | boolean   | 必須 | Auth UID一覧が完全かどうか             |
+| status                   | string    | 必須 | `deprovisioning`または`completed`      |
+| startedAt                | timestamp | 必須 | 削除処理を開始した日時                 |
+| completedAt              | timestamp | 任意 | 削除完了を検証した日時                 |
+| updatedAt                | timestamp | 必須 | 状態を更新した日時                     |
 
 ## channels
 

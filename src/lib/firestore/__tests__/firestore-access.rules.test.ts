@@ -68,6 +68,15 @@ beforeEach(async () => {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
+    await db.doc(`demoTenantDeprovisions/${tenantAlphaId}`).set({
+      authenticationVerifiable: true,
+      authUids: [adminAlphaUid, memberAlphaUid],
+      status: 'deprovisioning',
+      tenantId: tenantAlphaId,
+      startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
     await db.doc(`users/${adminAlphaUid}`).set({
       id: adminAlphaUid,
       displayName: 'Alpha Admin',
@@ -162,6 +171,14 @@ describe('firestore.rules access control', () => {
     await assertSucceeds(adminDb.doc(`tenantSecrets/${tenantAlphaId}`).get());
     await assertFails(adminDb.doc(`tenantSecrets/${tenantBetaId}`).get());
     await assertFails(memberDb.doc(`tenantSecrets/${tenantAlphaId}`).get());
+  });
+
+  it('削除再試行用メタデータは管理者ユーザーにも公開しない', async () => {
+    const db = testEnv.authenticatedContext(adminAlphaUid).firestore();
+    const stateRef = db.doc(`demoTenantDeprovisions/${tenantAlphaId}`);
+
+    await assertFails(stateRef.get());
+    await assertFails(stateRef.update({ status: 'completed' }));
   });
 
   it('所属テナント本体には参加コードが含まれない', async () => {
