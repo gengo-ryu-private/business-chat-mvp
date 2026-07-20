@@ -93,8 +93,6 @@ npm install
 
 `.env.local.example` を参考に `.env.local` を作成します。
 
-公開デモ用の環境変数とrate limitは、[公開デモのデプロイガイド](./docs/10-deployment-guide.md)を参照してください。
-
 開発サーバーを起動します。
 
 ```bash
