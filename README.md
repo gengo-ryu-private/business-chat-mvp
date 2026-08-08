@@ -120,6 +120,7 @@ http://localhost:3000
 - [ドキュメント管理方針](./docs/09-documentation-policy.md)
 - [公開デモのデプロイガイド](./docs/10-deployment-guide.md)
 - [公開デモの運用手順](./docs/11-demo-operations.md)
+- [面接・応募用のポートフォリオ説明](./docs/12-portfolio-explanation.md)
 
 ## 今後の改善点
 
