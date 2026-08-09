@@ -20,6 +20,7 @@ Firebase AuthenticationのUIDをアプリ内ユーザーのIDとして使用す�
 ```text
 users/{userId}
 tenants/{tenantId}
+tenantSecrets/{tenantId}
 tenants/{tenantId}/channels/{channelId}
 tenants/{tenantId}/channels/{channelId}/messages/{messageId}
 demoTenantDeprovisions/{tenantId}
