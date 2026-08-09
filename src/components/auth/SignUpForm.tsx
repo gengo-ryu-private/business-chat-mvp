@@ -133,6 +133,14 @@ export function SignUpForm({
         </CardHeader>
 
         <CardContent>
+          {tenantSignupDisabled && (
+            <Alert className="mb-4">
+              <AlertDescription>
+                現在、新規テナントの作成は停止しています。参加コードをお持ちの方のみ、既存テナントに参加できます。
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <fieldset className="space-y-3 rounded-lg border p-4">
               <legend className="px-1 text-sm font-medium">登録方法</legend>
