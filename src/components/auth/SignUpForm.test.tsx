@@ -39,7 +39,7 @@ describe('SignUpForm', () => {
     expect(screen.queryByLabelText('テナント名')).not.toBeInTheDocument();
   });
 
-  it('新規テナント作成が無効な場合は作成導線を非表示にする', () => {
+  it('新規テナント作成が無効な場合は作成導線を非表示にして案内を表示する', () => {
     renderSignUpForm({ tenantSignupDisabled: true });
 
     expect(
@@ -49,6 +49,11 @@ describe('SignUpForm', () => {
     expect(screen.getByLabelText('参加コード')).toBeInTheDocument();
     expect(
       screen.getByText('参加コードで既存テナントに参加します。')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        '現在、新規テナントの作成は停止しています。参加コードをお持ちの方のみ、既存テナントに参加できます。'
+      )
     ).toBeInTheDocument();
   });
 
