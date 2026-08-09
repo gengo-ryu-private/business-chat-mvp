@@ -47,7 +47,7 @@
 - サーバー側処理: Next.js Route Handler / Firebase Admin SDK
 - テスト: Vitest / React Testing Library / Playwright
 
-## 設計上の見どころ
+## 設計上のポイント
 
 ### 認証とテナント分離
 
