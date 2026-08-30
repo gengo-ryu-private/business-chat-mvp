@@ -39,3 +39,6 @@ next-env.d.ts
 
 # temporary
 /temp-next-app/
+
+# local demo operations records (may contain private recruiting metadata)
+/.demo-operations/
